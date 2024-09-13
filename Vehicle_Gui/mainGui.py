@@ -7,7 +7,7 @@ import PyQt5
 
 import sys
 
-import main_gui_2
+import main_gui_
 import login_gui
 
 
@@ -17,7 +17,7 @@ def main():
     login_dialog = login_gui.LoginDialog()
     if login_dialog.exec_() == QDialog.Accepted:
         print("login success") 
-        main_window = main_gui_2.WindowClass(login_dialog.isAdmin, login_dialog.name)
+        main_window = main_gui.WindowClass(login_dialog.isAdmin, login_dialog.name)
         main_window.show()
         sys.exit(app.exec_())
 
