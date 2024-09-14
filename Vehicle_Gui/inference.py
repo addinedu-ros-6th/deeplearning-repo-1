@@ -22,9 +22,6 @@ class Inference:
             for mask in masks:
                 mask = (mask * 255).astype('uint8')  # 마스크를 0-255 범위로 변환
                 colored_mask = cv2.merge([mask, mask, mask])  # 마스크를 3채널로 변환
-                # print("frame type:", type(frame))
-                # print("frame.shape:", frame.shape)
-                # print("colored_mask.shape:", colored_mask.shape)
                 frame = cv2.addWeighted(frame, 1, colored_mask, 0.5, 0)  # 프레임에 마스크를 합성
 
             # 바운딩 박스 그리기
@@ -52,9 +49,6 @@ class Inference:
             for mask in masks:
                 mask = (mask * 255).astype('uint8')  # 마스크를 0-255 범위로 변환
                 colored_mask = cv2.merge([mask, mask, mask])  # 마스크를 3채널로 변환
-                # print("frame type:", type(frame))
-                # print("frame.shape:", frame.shape)
-                # print("colored_mask.shape:", colored_mask.shape)
                 frame = cv2.addWeighted(frame, 1, colored_mask, 0.5, 0)  # 프레임에 마스크를 합성
 
             # 바운딩 박스 그리기
