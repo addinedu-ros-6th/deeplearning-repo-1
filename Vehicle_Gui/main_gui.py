@@ -18,7 +18,7 @@ import login_gui
 
 # PC 클라이언트, 파이 서버 버전 
 
-from_class = uic.loadUiType('./Vehicle_Gui/dl_gui.ui')[0]
+from_class = uic.loadUiType('./dl_gui.ui')[0]
 
 class WindowClass(QMainWindow, from_class):
     def __init__(self, isAdmin, name):
@@ -57,23 +57,27 @@ class WindowClass(QMainWindow, from_class):
         self.conn.close()
 
 
-    def socket_configuration(self):
+    def socket_configuration(self, timeout=3):
         self.host = '192.168.0.15'
         self.port = 9999
 
-        # 소켓 설정
-        # self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # self.server_socket.bind((self.host, self.port))
-        # self.server_socket.listen(1)
-
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((self.host, self.port))
 
-        print(f"Listening on {self.host}:{self.port}...")
+        self.client_socket.settimeout(timeout)
 
-        # 클라이언트 연결 대기
-        # self.client_socket, self.client_address = self.server_socket.accept()
+        try:
+            # 서버에 연결 시도
+            print(f"Trying to connect to {self.host}:{self.port}...")
+            self.client_socket.connect((self.host, self.port))
+            print(f"Connected to {self.host}:{self.port}")
+
+        except socket.timeout:
+            print(f"Connection timed out after {timeout} seconds")
+
+        except socket.error as e:
+            print(f"Socket error: {e}")
+
+        # print(f"Listening on {self.host}:{self.port}...")
     
     def db_configuration(self):
         db_config = {
@@ -83,10 +87,12 @@ class WindowClass(QMainWindow, from_class):
             'database': 'ardumension'
         }
 
+        print("connecting to database...")
+
         try:
-            print("connecting to database...")
             self.conn = mysql.connector.connect(**db_config)
             self.cursor = self.conn.cursor()
+            print("Connected to DB")
             
         except mysql.connector.Error as err:
             QMessageBox.critical(self, "Error", f"Error: {err}")
