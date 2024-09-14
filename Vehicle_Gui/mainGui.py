@@ -7,7 +7,7 @@ import PyQt5
 
 import sys
 
-import main_gui_
+import main_gui
 import login_gui
 
 

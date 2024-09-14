@@ -15,7 +15,7 @@ db_config = {
 class LoginDialog(QtWidgets.QDialog):
     def __init__(self):
         super(LoginDialog, self).__init__()
-        uic.loadUi("./Vehicle_Gui/login_gui.ui", self)  # login.ui 파일을 로드합니다.
+        uic.loadUi("./login_gui.ui", self)  # login.ui 파일을 로드합니다.
         self.login_button.clicked.connect(self.handle_login)
 
         self.isAdmin = False
