@@ -7,10 +7,10 @@ from PyQt5.QtCore import *
 import cv2
 import mysql
 
-import sys 
 import socket
 import struct
 import pickle
+import datetime
 
 from inference import Inference
 from judge import Judge
@@ -71,9 +71,12 @@ class WindowClass(QMainWindow, from_class):
         # 점수 차감
         self.judge = Judge()
 
-        self.score = 100
+        self.score = 0
         self.LCD_score.display(self.score)
         self.penalty = 0
+
+        self.path_user = '../pictures/user_log/'
+        self.path_admin = '../pictures/admin_log/'
 
     def __del__(self):
         self.client_socket.close()
@@ -158,7 +161,12 @@ class WindowClass(QMainWindow, from_class):
 
         self.show_frame(frame)
         # print(count, self.velocity)
-    
+
+        # 파일 저장을 위한 시간 저장
+        self.now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.file_name_user = self.path_user + self.car_number + '_' + self.now + '_' + count
+        self.file_name_admin = self.path_admin + self.car_number + '_' + self.now + '_' + count
+
     def show_frame(self, frame):
         try:
             frame, detects, cls_set = self.model.predict(frame)
@@ -175,7 +183,7 @@ class WindowClass(QMainWindow, from_class):
             # self.update_label(detected_classes)
             
             if self.penalty:
-                self.score -= self.penalty
+                self.score += self.penalty
                 print(self.score, self.penalty)
                 self.LCD_score.display(self.score)
                 self.label_lastPenalty.setText("-" + str(self.penalty))
@@ -195,7 +203,7 @@ class WindowClass(QMainWindow, from_class):
         self.cursor.execute(insert)
     
     def upload_new_object_data(self, _object):
-        insert = f"insert into ObjectLog values ({self.now}, {_object}, {self.car_number}, {self.title}, {self._json})"
+        insert = f"insert into ObjectLog values ({self.now}, {_object}, {self.car_number}, {self.path_admin}, {self._json}, {self.file_name_admin})"
         self.cursor.execute(insert)
 
     def update_label(self, detected_classes):
