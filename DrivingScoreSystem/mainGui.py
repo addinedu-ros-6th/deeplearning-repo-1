@@ -10,7 +10,7 @@ import sys
 # import login_gui
 # import main_gui_2
 from login_gui import LoginDialog
-from main_gui_3 import WindowClass
+from main_gui import WindowClass
 
 
 def main():
