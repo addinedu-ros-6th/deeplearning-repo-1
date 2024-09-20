@@ -29,30 +29,9 @@ System Requirements
 ## 1.6 도로 트랙 도면
 ![image](https://github.com/user-attachments/assets/f483455e-ab9b-4e39-af5f-001f7980428f)
 
-## 1.7 Research Data
-1. Labeling Name
 
-- 차선 <br>
-실선 lane <br>
-점선 dotted_lane <br>
-중앙선(노랑) yellow_lane <br>
-정지선 stop_line <br>
 
-- 횡단보도 crosswalk
-
-- 속도 표지판
-limit_30 <br>
-limit_50 <br>
-limit_100 <br>
-
-- 어린이 보호구역 kidzone
-
-- 구간단속 <br>
-시작 section_start
-
- 종료 section_end
-
-## 1.8 GUI
+## 1.7 GUI
 ![image](https://github.com/user-attachments/assets/a0c5b6f5-c8e7-45d0-9604-5001bf06335f)
 ![image](https://github.com/user-attachments/assets/010d945e-5b8e-47d9-912a-b6a479eabe97)
 ![image](https://github.com/user-attachments/assets/b9c7c3d3-78ed-4a7e-b50d-ec2b1353b3b6)
