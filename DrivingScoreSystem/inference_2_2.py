@@ -1,4 +1,5 @@
 from ultralytics import YOLO
+import numpy as np
 import cv2
 
 class Inference:
@@ -7,11 +8,14 @@ class Inference:
         self.model_sign = YOLO('../models/everything_2.pt')
 
 
-    def predict(self, frame):
+    # return = (frame, objects)
+    def predict(self, frame: np.ndarray) -> tuple[np.ndarray, list[dict[str: tuple[int, int, int, int]]], set[int]]:
         results_lane = self.model_lane(frame, verbose=False)
         results_sign = self.model_sign(frame, verbose=False)
 
-        # 추론 결과에서 세그멘테이션 마스크 및 바운딩 박스 정보 추출
+        detects = []
+        cls_list = []
+
         for result in results_lane:
             masks = result.masks.data.cpu().numpy() if result.masks else []
             boxes = result.boxes.data.cpu().numpy() if result.boxes else []
@@ -38,6 +42,10 @@ class Inference:
                 class_name = self.model_lane.names[class_id]
                 label = f'{class_name}'
                 cv2.putText(frame, label, (x1 + 40, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
+
+                detects.append({label: (x1, y1, x2, y2)})
+                cls_list.append(class_id)
+
 
         for result in results_sign:
             masks = result.masks.data.cpu().numpy() if result.masks else []
@@ -66,5 +74,10 @@ class Inference:
                 label = f'{class_name}'
                 cv2.putText(frame, label, (x1 + 40, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
 
-        return frame 
+                detects.append({label: (x1, y1, x2, y2)})
+                cls_list.append(class_id+1)
+        
+        cls_set = set(cls_list)
+
+        return (frame, detects, cls_set)
     

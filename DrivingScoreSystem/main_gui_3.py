@@ -12,28 +12,42 @@ import socket
 import struct
 import pickle
 
-from inference import Inference
+from inference_2_2 import Inference
+from judge_2 import Judge
 
 import login_gui
 
-# PC 클라이언트, 파이 서버 버전 
+'''
+TODO
+- 소켓, DB 재연결 버튼 만들기
+- illegalJudge 만들기
+- log 기록용 json형식 반환하기
+- 어보 빨간색 도로 처리하기
+- 
+'''
 
-from_class = uic.loadUiType('./dl_gui.ui')[0]
+from_class = uic.loadUiType('/home/jh/dev_ws/temp/dl_gui.ui')[0]
 
 class WindowClass(QMainWindow, from_class):
     def __init__(self, isAdmin, name):
         super().__init__()
         self.setupUi(self)
+
         self.username = name
         self.user_name.setText(name)
 
-        # if isAdmin:
-        #     self.Controll.setTabVisible(2, True)
-        #     print("tab shown")
-        # else:
-        #     self.Controll.setTabVisible(2, False)
-        #     print("tab hidden")
+        # 어드민 여부
+        self.admin_tab_index = 2
+        self.admin_tab_widget = self.Controll.widget(self.admin_tab_index)
+        
+        if isAdmin:
+            self.show_admin_tab()
+            print("Logged in as admin")
+        else:
+            self.hide_admin_tab()
+            print("Logged in as regular user")
 
+        # 소켓 설정
         self.socket_configuration()
 
         self.data = b""
@@ -43,13 +57,23 @@ class WindowClass(QMainWindow, from_class):
         self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
         self.socket_notifier.activated.connect(self.read_data)
 
-        # sql 연결하기
+        # DB 설정
         self.db_configuration()
 
+        # 추론 객체
         self.model = Inference()
 
-        self.btnLogout.clicked.connect(self.end_session)
-        
+        # 버튼
+        self.btn_logout.clicked.connect(self.end_session)
+        self.btn_robot.clicked.connect(self.socket_configuration)
+        self.btn_DB.clicked.connect(self.db_configuration)
+
+        # 점수 차감
+        self.judge = Judge()
+
+        self.score = 100
+        self.LCD_score.display(self.score)
+        self.penalty = 0
 
     def __del__(self):
         self.client_socket.close()
@@ -57,7 +81,13 @@ class WindowClass(QMainWindow, from_class):
         self.conn.close()
 
 
-    def socket_configuration(self, timeout=3):
+    def show_admin_tab(self):
+        self.Controll.insertTab(self.admin_tab_index, self.admin_tab_widget, "Object_Log")
+
+    def hide_admin_tab(self):
+        self.Controll.removeTab(self.admin_tab_index)
+
+    def socket_configuration(self, timeout=1):
         self.host = '192.168.0.15'
         self.port = 9999
 
@@ -109,18 +139,16 @@ class WindowClass(QMainWindow, from_class):
         while len(self.data) < msg_size:
             self.data += self.client_socket.recv(4096)
 
-        # count(4바이트)를 먼저 읽음
-        count_size = struct.calcsize("I")
-        packed_count = self.data[:count_size]
-        self.data = self.data[count_size:]
-        count = struct.unpack("I", packed_count)[0]
+        frame_data = self.data[:msg_size]
+        self.data = self.data[msg_size:]
 
-        # 나머지는 frame 데이터
-        frame_data = self.data[:msg_size - count_size]
-        self.data = self.data[msg_size - count_size:]
+        count = struct.unpack("I", frame_data[:4])[0]
+        frame_data = frame_data[4:]
 
         # 프레임을 역직렬화
-        frame = pickle.loads(frame_data)
+        frame, self.velocity = pickle.loads(frame_data)
+        self.velocity = int(self.velocity)
+        self.LCD_speed.display(self.velocity)
 
         # 프레임 크기 조정
         frame = cv2.resize(frame, (640, 480))
@@ -129,9 +157,11 @@ class WindowClass(QMainWindow, from_class):
         print("Received count:", count)
 
         self.show_frame(frame)
+        print(count, self.velocity)
+        return count, frame, self.velocity
     
     def show_frame(self, frame):
-        frame = self.model.predict(frame)
+        frame, detects, cls_set = self.model.predict(frame)
 
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         h, w, c = frame.shape
@@ -139,6 +169,16 @@ class WindowClass(QMainWindow, from_class):
         self.pixmap_monitor = QPixmap.fromImage(qimage)
         self.pixmap_monitor = self.pixmap_monitor.scaled(self.label.width(), self.label.height())
         self.label.setPixmap(self.pixmap_monitor)
+
+        # 점수 차감
+        self.charge, self.penalty = self.judge.verdict(detects, cls_set)
+
+        if self.penalty:
+            self.score -= self.penalty
+            self.LCD_score.display(self.score)
+            self.label_lastPenalty.setText("-" + str(self.penalty))
+
+
     
     def end_session(self):
         self.close()

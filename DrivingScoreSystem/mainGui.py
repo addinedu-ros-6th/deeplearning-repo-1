@@ -7,17 +7,21 @@ import PyQt5
 
 import sys
 
-import main_gui
-import login_gui
+# import login_gui
+# import main_gui_2
+from login_gui import LoginDialog
+from main_gui_3 import WindowClass
 
 
 def main():
     app = QApplication(sys.argv)
-
-    login_dialog = login_gui.LoginDialog()
+ 
+    # login_dialog = login_gui.LoginDialog()
+    login_dialog = LoginDialog()
     if login_dialog.exec_() == QDialog.Accepted:
         print("login success") 
-        main_window = main_gui.WindowClass(login_dialog.isAdmin, login_dialog.name)
+        # main_window = main_gui_2.WindowClass(login_dialog.isAdmin, login_dialog.name)
+        main_window = WindowClass(login_dialog.isAdmin, login_dialog.name)
         main_window.show()
         sys.exit(app.exec_())
 
