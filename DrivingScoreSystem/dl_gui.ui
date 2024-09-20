@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">QTabBar::tab { width: 514px; }</string>
+    <string notr="true">QTabBar::tab { height: 40; width: 514px; font-size: 12pt; }</string>
    </property>
    <property name="tabPosition">
     <enum>QTabWidget::North</enum>
@@ -105,7 +105,7 @@
        <rect>
         <x>10</x>
         <y>40</y>
-        <width>181</width>
+        <width>191</width>
         <height>41</height>
        </rect>
       </property>
@@ -117,18 +117,24 @@
       <property name="text">
        <string>plate_num</string>
       </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
      </widget>
      <widget class="QLabel" name="label_plate">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>111</width>
+        <width>191</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
        <string>License Plate</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </widget>
