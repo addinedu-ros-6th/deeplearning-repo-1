@@ -29,12 +29,12 @@ class LoginDialog(QtWidgets.QDialog):
         try:
             conn = mysql.connector.connect(**db_config)
             cursor = conn.cursor()
-            query = "SELECT * FROM login_info WHERE username=%s AND password=%s"
+            query = "SELECT * FROM UserData WHERE username=%s AND password=%s"
             cursor.execute(query, (username, password))
             result = cursor.fetchone()
 
             if result:
-                _, _, _, self.isAdmin, self.name = result
+                self.id, _, self.isAdmin, self.number, _ = result
                 QMessageBox.information(self, "Success", "Login successful!")
                 self.accept()  # 로그인 성공 시 창을 닫음
             else:
