@@ -29,12 +29,13 @@ TODO
 from_class = uic.loadUiType('./dl_gui.ui')[0]
 
 class WindowClass(QMainWindow, from_class):
-    def __init__(self, isAdmin, name):
+    def __init__(self, id, isAdmin, number):
         super().__init__()
         self.setupUi(self)
 
-        self.username = name
-        self.user_name.setText(name)
+        self.user_id = id
+        self.car_number = number
+        self.label_car_number.setText(number)
 
         # 어드민 여부
         self.admin_tab_index = 2
