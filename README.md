@@ -4,8 +4,10 @@
 
 ##  1.1 개요
 - Camera 웹캠을 활용한 벌점 시스템을 이용하여 난폭운전방지하는 프로젝트
+
+## 1.2 프로젝트 기간 : 2024. 08. 30 ~ 2024. 09. 25
   
-## 1.2 프로젝트 계획표
+## 1.3 프로젝트 계획표
 |주차|	기간 |	소요시간 |	실습주제 |	필요장비 |	담당 |
 |:----------:|:----------:|:----------:|:----------:|:----------:|:----------:|
 | 1주차 | 08.30 ~ 09.07 | 192시간 |System Architecture | draw.io | 팀 5명 | 
@@ -15,18 +17,18 @@
 | 4주차 | 09.14 ~ 09.21 | 168시간 | 기능구현 | ubunto, python, <br> vscode, arduino , minibot  | 5명|
 | 5주차 | 09.20 ~ 09.23 | 72시간 | 연동테스트 | 도로, minibot | 5명 |
 
-## 1.3 구현 기능 및 관련 기술
+## 1.4 구현 기능 및 관련 기술
 System Requirements
 
 ![image](https://github.com/user-attachments/assets/a0656b87-7abd-45bf-b08f-d8563af95463)
 
-## 1.4 시스템 구성도
+## 1.5 시스템 구성도
 ![image](https://github.com/user-attachments/assets/c22ef6cd-cf62-4ee5-b65e-d28349a2571e)
 
-## 1.5 DATA BASE
+## 1.6 DATA BASE
 ![image](https://github.com/user-attachments/assets/8953e560-ecbf-4fd0-a911-a5c6c3ff4053)
 
-## 1.6 도로 트랙 도면
+## 1.7 도로 트랙 도면
 ![image](https://github.com/user-attachments/assets/f483455e-ab9b-4e39-af5f-001f7980428f)
 
 
