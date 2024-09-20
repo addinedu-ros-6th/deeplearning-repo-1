@@ -1,4 +1,3 @@
-# from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QDialog
 from PyQt5.QtCore import QSocketNotifier, QObject
 from PyQt5.QtGui import *
@@ -25,6 +24,8 @@ TODO
 - 어보 빨간색 도로 처리하기
 - 로그 쿼리 작성하기
 - 로그 검색기능 완성하기
+- sql 파일 만들기
+    - sql 테이블 생성하는 코드 작성하기. 
 - 
 '''
 
@@ -78,8 +79,8 @@ class WindowClass(QMainWindow, from_class):
         self.LCD_score.display(self.score)
         self.penalty = 0
 
-        self.path_user = '../pictures/user_log/'
-        self.path_admin = '../pictures/admin_log/'
+        self.path_user = '../pictures/user_log/' + self.car_number + '/'
+        self.path_admin = '../pictures/admin_log/' + self.car_number + '/'
 
     def __del__(self):
         self.client_socket.close()
@@ -167,22 +168,21 @@ class WindowClass(QMainWindow, from_class):
 
         # 파일 저장을 위한 시간 저장
         self.now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.file_name_user = self.path_user + self.car_number + '_' + self.now + '_' + count
-        self.file_name_admin = self.path_admin + self.car_number + '_' + self.now + '_' + count
+        self.file_name = self.car_number + '_' + self.now + '_' + count
 
     def show_frame(self, frame):
         try:
-            frame, detects, cls_set = self.model.predict(frame)
+            frame_boxed, detects, cls_set = self.model.predict(frame)
 
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            h, w, c = frame.shape
-            qimage = QImage(frame.data, w, h, w * c, QImage.Format_RGB888)
+            frame_boxed = cv2.cvtColor(frame_boxed, cv2.COLOR_BGR2RGB)
+            h, w, c = frame_boxed.shape
+            qimage = QImage(frame_boxed.data, w, h, w * c, QImage.Format_RGB888)
             self.pixmap_monitor = QPixmap.fromImage(qimage)
             self.pixmap_monitor = self.pixmap_monitor.scaled(self.label.width(), self.label.height())
             self.label.setPixmap(self.pixmap_monitor)
 
             # 점수 차감
-            self.charge, self.penalty, detected_classes = self.judge.verdict(detects, cls_set, self.velocity)
+            self.charge_id, self.penalty, detected_classes, self.is_new_object, self.new_object = self.judge.verdict(detects, cls_set, self.velocity)
             # self.update_label(detected_classes)
             
             if self.penalty:
@@ -193,10 +193,12 @@ class WindowClass(QMainWindow, from_class):
 
                 # 감점사항 있을 시 DB 업로드
                 self.upload_penalty_data()
+                cv2.imwrite(self.path_user+self.file_name, frame)
             
             # 새로운 객체 감지 시 DB 업로드
             for e in self.new_object:
                 self.upload_new_object_data(e)
+                cv2.imwrite(self.path_admin+self.file_name, frame)
 
         except Exception as e:
             print(f"Error in show_frame: {e}")
@@ -206,7 +208,7 @@ class WindowClass(QMainWindow, from_class):
         self.cursor.execute(insert)
     
     def upload_new_object_data(self, _object):
-        insert = f"insert into ObjectLog values ({self.now}, {_object}, {self.car_number}, {self.path_admin}, {self._json}, {self.file_name_admin})"
+        insert = f"insert into ObjectLog values ({self.now}, {_object}, {self.car_number}, {self.path_admin}, {self._json}, {self.file_name})"
         self.cursor.execute(insert)
 
     def update_label(self, detected_classes):
