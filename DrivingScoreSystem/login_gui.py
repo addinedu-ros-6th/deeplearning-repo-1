@@ -1,7 +1,8 @@
-import sys
 from PyQt5 import QtWidgets, uic
 import mysql.connector
 from PyQt5.QtWidgets import QMessageBox
+
+import os
 
 # MySQL 연결 정보
 db_config = {
@@ -21,6 +22,9 @@ class LoginDialog(QtWidgets.QDialog):
         self.isAdmin = False
         self.name = ""
 
+        self.path_user = "../pictures/user_log/"
+        self.path_admin = "../pictures/admin_log/"
+
     def handle_login(self):
         username = self.username_input.text()
         password = self.password_input.text()
@@ -35,6 +39,15 @@ class LoginDialog(QtWidgets.QDialog):
 
             if result:
                 self.id, _, self.isAdmin, self.number, _ = result
+
+                # 유저마다 다른 폴더 만들어서 사진 저장
+                admin_pic_dir = self.path_admin + self.number
+                user_pic_dir = self.path_user + self.number
+                if not os.path.exists(admin_pic_dir):
+                    os.makedirs(admin_pic_dir)
+                if not os.path.exists(user_pic_dir):
+                    os.makedirs(user_pic_dir)
+
                 QMessageBox.information(self, "Success", "Login successful!")
                 self.accept()  # 로그인 성공 시 창을 닫음
             else:
