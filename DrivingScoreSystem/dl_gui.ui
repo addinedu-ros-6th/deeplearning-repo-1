@@ -100,7 +100,7 @@
      <property name="title">
       <string/>
      </property>
-     <widget class="QLabel" name="car_number">
+     <widget class="QLabel" name="label_car_number">
       <property name="geometry">
        <rect>
         <x>10</x>
