@@ -29,7 +29,7 @@
     <enum>QTabWidget::North</enum>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="Main">
     <property name="font">
@@ -59,9 +59,9 @@
     <widget class="QPushButton" name="btn_logout">
      <property name="geometry">
       <rect>
-       <x>1340</x>
-       <y>50</y>
-       <width>181</width>
+       <x>1230</x>
+       <y>60</y>
+       <width>211</width>
        <height>61</height>
       </rect>
      </property>
@@ -88,68 +88,10 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>1210</x>
-       <y>40</y>
-       <width>111</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <property name="autoFillBackground">
-      <bool>false</bool>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <widget class="QPushButton" name="btn_robot">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>89</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Robot</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="btn_DB">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>50</y>
-        <width>89</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Database</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>1220</x>
-       <y>20</y>
-       <width>91</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Reconnect</string>
-     </property>
-    </widget>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="geometry">
       <rect>
-       <x>1210</x>
+       <x>1230</x>
        <y>150</y>
        <width>211</width>
        <height>91</height>
@@ -193,7 +135,7 @@
     <widget class="QGroupBox" name="groupBox_3">
      <property name="geometry">
       <rect>
-       <x>1209</x>
+       <x>1230</x>
        <y>260</y>
        <width>281</width>
        <height>521</height>
@@ -278,7 +220,7 @@
    </widget>
    <widget class="QWidget" name="Log">
     <attribute name="title">
-     <string>Log</string>
+     <string>Penalty History</string>
     </attribute>
     <widget class="QTableWidget" name="tableWidget">
      <property name="geometry">
@@ -406,13 +348,32 @@
       </property>
      </item>
     </widget>
+    <widget class="QLabel" name="label_preview_1">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>90</y>
+       <width>861</width>
+       <height>691</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string>Image Preview</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="object_log">
     <property name="enabled">
      <bool>true</bool>
     </property>
     <attribute name="title">
-     <string>Object_Log</string>
+     <string>Admin Log</string>
     </attribute>
     <widget class="QTableWidget" name="tableWidget_2">
      <property name="geometry">
@@ -503,7 +464,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_preview">
+    <widget class="QLabel" name="label_preview_2">
      <property name="geometry">
       <rect>
        <x>640</x>
