@@ -158,7 +158,6 @@ class WindowClass(QMainWindow, from_class):
 
         self.show_frame(frame)
         # print(count, self.velocity)
-        return count, frame, self.velocity
     
     def show_frame(self, frame):
         try:
@@ -181,10 +180,23 @@ class WindowClass(QMainWindow, from_class):
                 self.LCD_score.display(self.score)
                 self.label_lastPenalty.setText("-" + str(self.penalty))
 
-                
+                # 감점사항 있을 시 DB 업로드
+                self.upload_penalty_data()
+            
+            # 새로운 객체 감지 시 DB 업로드
+            for e in self.new_object:
+                self.upload_new_object_data(e)
 
         except Exception as e:
             print(f"Error in show_frame: {e}")
+    
+    def upload_penalty_data(self):
+        insert = f"insert into PenaltyLog values ({self.now}, {self.user_id}, {self.charge_id}, {self.velocity})"
+        self.cursor.execute(insert)
+    
+    def upload_new_object_data(self, _object):
+        insert = f"insert into ObjectLog values ({self.now}, {_object}, {self.car_number}, {self.title}, {self._json})"
+        self.cursor.execute(insert)
 
     def update_label(self, detected_classes):
         # set 데이터를 문자열로 변환하여 표시 (콤마로 구분)
