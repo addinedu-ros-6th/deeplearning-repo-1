@@ -21,7 +21,7 @@ def main():
     if login_dialog.exec_() == QDialog.Accepted:
         print("login success") 
         # main_window = main_gui_2.WindowClass(login_dialog.isAdmin, login_dialog.name)
-        main_window = WindowClass(login_dialog.isAdmin, login_dialog.name)
+        main_window = WindowClass(login_dialog.id, login_dialog.isAdmin, login_dialog.number)
         main_window.show()
         sys.exit(app.exec_())
 
