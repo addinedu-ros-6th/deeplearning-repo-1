@@ -12,16 +12,16 @@ import socket
 import struct
 import pickle
 
-from inference_2_2 import Inference
-from judge_2 import Judge
+from inference import Inference
+from judge import Judge
 
 import login_gui
 
 '''
 TODO
-- 소켓, DB 재연결 버튼 만들기
-- illegalJudge 만들기
 - log 기록용 json형식 반환하기
+    - json 뭐 들어갈지 정하기
+- Object_Log에서 로그 더블클릭/조회 버튼 누르면 사진 띄우기
 - 어보 빨간색 도로 처리하기
 - 
 '''
@@ -65,8 +65,8 @@ class WindowClass(QMainWindow, from_class):
 
         # 버튼
         self.btn_logout.clicked.connect(self.end_session)
-        self.btn_robot.clicked.connect(self.socket_configuration)
-        self.btn_DB.clicked.connect(self.db_configuration)
+        self.btn_search_1.clicked.connect(self.load_user_db)
+        self.btn_search_2.clicked.connect(self.load_admin_db)
 
         # 점수 차감
         self.judge = Judge()
