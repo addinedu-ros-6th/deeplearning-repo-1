@@ -4,7 +4,6 @@ class Judge:
     def __init__(self):
         self.charge = ""
         
-
         len = 5
         self.lane = deque(maxlen=len)
         self.dotted_lane = deque(maxlen=len)
@@ -40,24 +39,36 @@ class Judge:
         self.traffic_light_yellow_status = 0
         self.traffic_light_red_status = 0
         self.person_status = 0
-        self.redzone = 0
+        self.redzone_status = 0
+
+        self.stop_line_status_prev = 0
+        self.kidzone_prev = 0
 
         #벌점 사항
-        self.stop_line_over = 0
-        self.crosswalk_over = 0
-        self.speed_limit_30_over = 0
-        self.speed_limit_50_over = 0
-        self.speed_limit_100_over = 0
+        self.stop_line_prev = 0
+        self.crosswalk_prev = 0
+        self.speed_limit_30_prev = 0
+        self.speed_limit_50_prev = 0
+        self.speed_limit_100_prev = 0
+        self.green_signal_prev = 0
+        self.limit_100_status_prev = 0
 
         self.velocity = 30
-
+       
         self.detected = [self.lane, self.dotted_lane, self.yellow_lane, self.stop_line, self.crosswalk, self.limit_30, self.limit_50, 
                          self.limit_100, self.kidzone, self.section_start, self.section_end, self.oneway, 
                          self.traffic_light_green, self.traffic_light_yellow, self.traffic_light_red, self.person]
-
+        
+        
     def verdict(self, detects: dict[str: tuple[int, int, int, int]], cls_set: set[int]) -> tuple[str, int]:
 
         self.penalty = 0
+        stop_line_over = 10
+        crosswalk_over = 15
+        speed_limit_30_over = 30
+        speed_limit_50_over = 10
+        speed_limit_100_over = 20
+        green_signal_over = 15
 
         # 탐지된 객체 업데이트
         for idx in range(len(self.detected)):
@@ -66,7 +77,7 @@ class Judge:
             else:
                 self.detected[idx].append(False)
 
-        print(detects)
+        # print(detects)
         
         for detect in detects:
             for cls, bb_coordinates in detect.items():
@@ -77,39 +88,43 @@ class Judge:
                 center_x = (x1 + x2) // 2
                 center_y = (y1 + y2) // 2
 
-                print(f"Detected class: {cls}")
-                print(f"area : {area}")
+                # print(f"Detected class: {cls}")
+                # print(f"area : {area}")
 
-                if cls == "lane" and (False not in self.lane) and (len(self.lane) == 5):
+                if cls == "lane" and (len(self.lane) == 5):
                     self.lane_status = 1
                     
-                elif cls == "dotted_lane" and (False not in self.dotted_lane) and (len(self.dotted_lane) == 5):
+                elif cls == "dotted_lane" and (len(self.dotted_lane) == 5):
                     self.dotted_lane_status = 1
 
-                elif cls == "yellow_lane" and (False not in self.yellow_lane) and (len(self.yellow_lane) == 5):
+                elif cls == "yellow_lane" and (len(self.yellow_lane) == 5):
                     self.yellow_lane_status = 1
 
                 elif cls == "stop_line" and (len(self.stop_line) == 5):
-                    if area > 13500:
+                    if area > 13000:    
                         self.stop_line_status = 1
-                    elif self.stop_line_status == 1 and area < 6000:
-                        self.stop_line_status = 0
+                        self.stop_line_status_prev = 1
 
                 elif cls == "crosswalk" and (len(self.crosswalk) == 5):
-                    if area > 32000:
+                    if area > 55000:
                         self.crosswalk_status = 1
 
                 elif cls == "limit_30" and (len(self.limit_30) == 5):
                     self.limit_30_status = 1  
+                    self.limit = 30
 
                 elif cls == "limit_50" and (len(self.limit_50) == 5):
                     self.limit_50_status = 1 
+                    self.limit = 50
 
                 elif cls == "limit_100" and (len(self.limit_100) == 5):
                     self.limit_100_status = 1
+                    self.limit_100_status_prev = 1
+                    self.limit = 100
 
                 elif cls == "kidzone" and (len(self.kidzone) == 5):
                     self.kidzone_status = 1  
+                    self.kidzone_prev = 1
 
                 elif cls == "section_start" and (len(self.section_start) == 5):
                     self.section_start_status = 1  
@@ -127,48 +142,65 @@ class Judge:
                     self.traffic_light_yellow_status = 1  
 
                 elif cls == "traffic_light_red" and (len(self.traffic_light_red) == 5):
-                    if area > 1100:
-                        self.traffic_light_red_status = 1
+                    # if area > 1100:
+                    self.traffic_light_red_status = 1
                        
                 elif cls == "person" and (len(self.person) == 5):
-                    if area > 1200:
+                    if area > 10000:
                         self.person_status = 1
-        
-        # 신호등 빨간 불일 때 정지선 없음 감점 -10
-        if self.traffic_light_red_status == 1 and self.stop_line_status == 0 and self.velocity > 10 and self.stop_line_over == 0:
-            self.penalty += 10   
-            self.stop_line_over = 1
-            self.traffic_light_red_status = 0
-       
+              
+        # 횡단보도에 사람 있을 때 속도가 있으면 -15
+        if self.crosswalk_status == 1 and self.person_status == 1 and self.velocity > 0 and self.crosswalk_prev == 0:
+            self.penalty += crosswalk_over   
+            self.crosswalk_prev = 1
+            print("crosswalk_over")
 
-        # 신호등 빨간 불일 때 정지선 없음 감점 -20
-        if self.crosswalk_status == 1 and self.person_status == 1 and self.velocity > 10 and self.crosswalk_over == 0:
-            self.penalty += 20   
-            self.crosswalk_over = 1
+        # 초록불이고 정지선이 있을 때 속도가 10보다 작으면 -15
+        if self.traffic_light_green == 1 and self.stop_line_status == 1 and self.velocity < 10 and self.green_signal_prev == 0:
+            self.penalty += green_signal_over   
+            self.green_signal_prev = 1
+            print("green_signal_over")
 
-        
-         # 어린이 보호 구역 30 -15
-        if self.kidzone == 1 and self.limit_30 == 1 and self.redzone == 0 and self.velocity > 30 and self.speed_limit_30_over == 0:
-            self.penalty += 15   
-            self.speed_limit_30_over = 1
-        else:
-            self.speed_limit_30_over = 0
-
-        
-        #  # 구간 단속 50 이상 -5
+        #  # 구간 단속 50 이상이면 -10
         # if self.section_velocity > 30: 
-        #     self.penalty += 5   
+        #     self.penalty += speed_limit_50_over   
 
+        # 100 표지판이 보였다가 안보였을 때 속도가 100 이상이면 -10
+        if self.limit_100_status == 0 and self.limit_100_status_prev == 1 and self.velocity > 100:
+            self.penalty += speed_limit_100_over   
+            self.speed_limit_100_prev = 0
+            print("speed_limit_100_over")
         
-          # 구간 단속 100 이상 -25
-        if self.limit_100_status == 1 and self.velocity > 100 and self.speed_limit_100_over == 0: 
-            self.penalty += 25   
-            self.speed_limit_100_over = 1
+        status_mapping = { 'lane': 'lane_status', 'dotted_lane': 'dotted_lane_status', 'yellow_lane': 'yellow_lane_status', 'stop_line': 'stop_line_status',                             
+                            'crosswalk': 'crosswalk_status', 'limit_30': 'limit_30_status', 'limit_50': 'limit_50_status', 'limit_100': 'limit_100_status',                             
+                            'kidzone': 'kidzone_status', 'section_start': 'section_start_status', 'section_end': 'section_end_status',                             
+                            'oneway': 'oneway_status', 'traffic_light_green': 'traffic_light_green_status', 'traffic_light_yellow': 'traffic_light_yellow_status',                             
+                            'traffic_light_red': 'traffic_light_red_status', 'person': 'person_status'}
 
+        #인식 물체
+        self.detected_classes = set()
 
-        # if detects in self.detected
-        
+        for detect in detects:
+            self.detected_classes.update(detect.keys())
 
+        # print("self.detected_classes", self.detected_classes)
+        for cls in status_mapping:
+            if cls not in self.detected_classes:
+                setattr(self, status_mapping[cls], 0)
 
+        # 신호등 빨간 불일 때 정지선이 있었다가 없을 때 속도가 있으면 -10
+        if self.traffic_light_red_status == 1 and self.stop_line_status == 0 and self.stop_line_status_prev == 1 and self.velocity > 0 and self.stop_line_prev == 0:
+            self.penalty += stop_line_over   
+            self.stop_line_over = 1
+            self.stop_line_status_prev = 0
+            print("stop_line_over")
+
+        # 어린이보호구역 표지판이 있다가 없어지고 빨간 영역이 있을때 속도가 30 초과이면 -30
+        if self.kidzone == 0 and self.kidzone_prev == 1 and self.redzone_status == 1 and self.velocity > 30 and self.speed_limit_30_prev == 0:
+            self.penalty += speed_limit_30_over   
+            self.speed_limit_30_prev = 1
+            print("speed_limit_30_over")
+        else:
+            self.speed_limit_30_prev = 0
 
         return (self.charge, self.penalty)
