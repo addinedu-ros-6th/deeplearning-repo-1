@@ -11,19 +11,25 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>난폭운전방지</string>
   </property>
   <widget class="QTabWidget" name="Controll">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>20</y>
-     <width>1541</width>
+     <width>1542</width>
      <height>851</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QTabBar::tab { width: 514px; }</string>
+   </property>
+   <property name="tabPosition">
+    <enum>QTabWidget::North</enum>
+   </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="Main">
     <property name="font">
@@ -152,7 +158,7 @@
      <property name="title">
       <string/>
      </property>
-     <widget class="QLabel" name="user_name">
+     <widget class="QLabel" name="car_number">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -167,10 +173,10 @@
        </font>
       </property>
       <property name="text">
-       <string>user_name</string>
+       <string>plate_num</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_user">
+     <widget class="QLabel" name="label_plate">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -180,7 +186,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>User</string>
+       <string>License Plate</string>
       </property>
      </widget>
     </widget>
@@ -278,9 +284,9 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>40</y>
+       <y>70</y>
        <width>1471</width>
-       <height>741</height>
+       <height>711</height>
       </rect>
      </property>
      <column>
@@ -314,6 +320,92 @@
       </property>
      </column>
     </widget>
+    <widget class="QDateTimeEdit" name="dateTime_start_1">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>20</y>
+       <width>161</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QDateTimeEdit" name="dateTime_end_1">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>20</y>
+       <width>161</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_search_1">
+     <property name="geometry">
+      <rect>
+       <x>770</x>
+       <y>20</y>
+       <width>71</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Search</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>10</y>
+       <width>21</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string> ~ </string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="geometry">
+      <rect>
+       <x>530</x>
+       <y>20</y>
+       <width>231</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox_1">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>20</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>minus reason</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>penalty</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>speed</string>
+      </property>
+     </item>
+    </widget>
    </widget>
    <widget class="QWidget" name="object_log">
     <property name="enabled">
@@ -326,9 +418,9 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>40</y>
+       <y>70</y>
        <width>1471</width>
-       <height>741</height>
+       <height>711</height>
       </rect>
      </property>
      <column>
@@ -338,9 +430,117 @@
      </column>
      <column>
       <property name="text">
+       <string>plate number</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>object</string>
       </property>
      </column>
+    </widget>
+    <widget class="QDateTimeEdit" name="dateTime_start_2">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>20</y>
+       <width>161</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="displayFormat">
+      <string>yy. M. d.  h:mm</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>10</y>
+       <width>21</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string> ~ </string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_search_2">
+     <property name="geometry">
+      <rect>
+       <x>770</x>
+       <y>20</y>
+       <width>71</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Search</string>
+     </property>
+    </widget>
+    <widget class="QDateTimeEdit" name="dateTime_end_2">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>20</y>
+       <width>161</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit_2">
+     <property name="geometry">
+      <rect>
+       <x>530</x>
+       <y>20</y>
+       <width>231</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_preview">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>90</y>
+       <width>861</width>
+       <height>691</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string>Image Preview</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox_2">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>20</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>plate</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>object</string>
+      </property>
+     </item>
     </widget>
    </widget>
   </widget>
