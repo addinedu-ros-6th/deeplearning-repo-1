@@ -23,6 +23,8 @@ TODO
     - json 뭐 들어갈지 정하기
 - Object_Log에서 로그 더블클릭/조회 버튼 누르면 사진 띄우기
 - 어보 빨간색 도로 처리하기
+- 로그 쿼리 작성하기
+- 로그 검색기능 완성하기
 - 
 '''
 
@@ -212,6 +214,12 @@ class WindowClass(QMainWindow, from_class):
         label_text = ", ".join(detected_classes)
         self.label_status_desc.setText(f"Detected Classes: {label_text}")
     
+    def load_user_db(self):
+        query = f"select "
+    
+    def load_admin_db(self):
+        pass
+
     def end_session(self):
         self.close()
         self.show_login()

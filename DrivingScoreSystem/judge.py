@@ -54,11 +54,21 @@ class Judge:
         self.limit_100_status_prev = 0
 
         # self.velocity = 30
+
+        # 새로운 객체 감지
+        self.objects_list = set()
+        self.objects_list_prev = set()
+        self.objects_cnt = len(self.objects_list)
+        self.objects_cnt_prev = self.objects_cnt
+        self.is_new_object = False
+        self.new_object = set()
        
         self.detected = [self.lane, self.dotted_lane, self.yellow_lane, self.stop_line, self.crosswalk, self.limit_30, self.limit_50, 
                          self.limit_100, self.kidzone, self.section_start, self.section_end, self.oneway, 
                          self.traffic_light_green, self.traffic_light_yellow, self.traffic_light_red, self.person]
         
+        self.detected_classes = set()
+
         
     def verdict(self, detects: dict[str: tuple[int, int, int, int]], cls_set: set[int], velocity) -> tuple[str, int]:
 
@@ -80,6 +90,8 @@ class Judge:
         # print(detects)
         
         for detect in detects:
+            self.detected_classes.update(detect.keys())
+
             for cls, bb_coordinates in detect.items():
                 x1, y1, x2, y2 = bb_coordinates
                 width = x2 - x1
@@ -87,6 +99,17 @@ class Judge:
                 area = width * height
                 center_x = (x1 + x2) // 2
                 center_y = (y1 + y2) // 2
+
+                # 새로운 객체 감지
+                self.objects_list_prev = self.objects_list
+                self.objects_list.add(cls)
+
+                self.objects_cnt_prev = self.objects_cnt
+                self.objects_cnt = len(self.objects_list)
+
+                if (self.objects_cnt > self.objects_cnt_prev) and (self.objects_list != self.objects_list_prev):
+                    self.is_new_object = True
+                    self.new_object = self.objects_list - self.objects_list_prev
 
                 # print(f"Detected class: {cls}")
                 # print(f"area : {area}")
@@ -177,12 +200,6 @@ class Judge:
                             'oneway': 'oneway_status', 'traffic_light_green': 'traffic_light_green_status', 'traffic_light_yellow': 'traffic_light_yellow_status',                             
                             'traffic_light_red': 'traffic_light_red_status', 'person': 'person_status'}
 
-        #인식 물체
-        self.detected_classes = set()
-
-        for detect in detects:
-            self.detected_classes.update(detect.keys())
-
         # print("self.detected_classes", self.detected_classes)
         for cls in status_mapping:
             if cls not in self.detected_classes:
@@ -203,4 +220,4 @@ class Judge:
         else:
             self.speed_limit_30_prev = 0
 
-        return (self.charge, self.penalty, self.detected_classes)
+        return (self.charge, self.penalty, self.detected_classes, self.is_new_object, self.new_object)
