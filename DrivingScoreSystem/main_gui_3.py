@@ -26,7 +26,7 @@ TODO
 - 
 '''
 
-from_class = uic.loadUiType('/home/jh/dev_ws/temp/dl_gui.ui')[0]
+from_class = uic.loadUiType('./dl_gui.ui')[0]
 
 class WindowClass(QMainWindow, from_class):
     def __init__(self, isAdmin, name):
@@ -154,31 +154,42 @@ class WindowClass(QMainWindow, from_class):
         frame = cv2.resize(frame, (640, 480))
 
         # 수신한 count 값 출력
-        print("Received count:", count)
+        # print("Received count:", count)
 
         self.show_frame(frame)
-        print(count, self.velocity)
+        # print(count, self.velocity)
         return count, frame, self.velocity
     
     def show_frame(self, frame):
-        frame, detects, cls_set = self.model.predict(frame)
+        try:
+            frame, detects, cls_set = self.model.predict(frame)
 
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        h, w, c = frame.shape
-        qimage = QImage(frame.data, w, h, w*c, QImage.Format_RGB888)
-        self.pixmap_monitor = QPixmap.fromImage(qimage)
-        self.pixmap_monitor = self.pixmap_monitor.scaled(self.label.width(), self.label.height())
-        self.label.setPixmap(self.pixmap_monitor)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            h, w, c = frame.shape
+            qimage = QImage(frame.data, w, h, w * c, QImage.Format_RGB888)
+            self.pixmap_monitor = QPixmap.fromImage(qimage)
+            self.pixmap_monitor = self.pixmap_monitor.scaled(self.label.width(), self.label.height())
+            self.label.setPixmap(self.pixmap_monitor)
 
-        # 점수 차감
-        self.charge, self.penalty = self.judge.verdict(detects, cls_set)
+            # 점수 차감
+            self.charge, self.penalty, detected_classes = self.judge.verdict(detects, cls_set, self.velocity)
+            # self.update_label(detected_classes)
+            
+            if self.penalty:
+                self.score -= self.penalty
+                print(self.score, self.penalty)
+                self.LCD_score.display(self.score)
+                self.label_lastPenalty.setText("-" + str(self.penalty))
 
-        if self.penalty:
-            self.score -= self.penalty
-            self.LCD_score.display(self.score)
-            self.label_lastPenalty.setText("-" + str(self.penalty))
+                
 
+        except Exception as e:
+            print(f"Error in show_frame: {e}")
 
+    def update_label(self, detected_classes):
+        # set 데이터를 문자열로 변환하여 표시 (콤마로 구분)
+        label_text = ", ".join(detected_classes)
+        self.label_status_desc.setText(f"Detected Classes: {label_text}")
     
     def end_session(self):
         self.close()

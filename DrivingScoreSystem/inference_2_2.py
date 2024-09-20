@@ -4,8 +4,8 @@ import cv2
 
 class Inference:
     def __init__(self):
-        self.model_lane = YOLO('../models/best_lane.pt')
-        self.model_sign = YOLO('../models/everything_2.pt')
+        self.model_lane = YOLO('/home/sh/dev_ws/best_lane (1).pt')
+        self.model_sign = YOLO('/home/sh/dev_ws/track+everything.pt')
 
 
     # return = (frame, objects)
