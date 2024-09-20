@@ -17,23 +17,23 @@ class Judge:
     def __init__(self):
         self.charge = ""
         
-        len = 5
-        self.lane = deque(maxlen=len)
-        self.dotted_lane = deque(maxlen=len)
-        self.yellow_lane = deque(maxlen=len)
-        self.stop_line = deque(maxlen=len)
-        self.crosswalk = deque(maxlen=len)
-        self.limit_30 = deque(maxlen=len)
-        self.limit_50 = deque(maxlen=len)
-        self.limit_100 = deque(maxlen=len)
-        self.kidzone = deque(maxlen=len)
-        self.section_start = deque(maxlen=len)
-        self.section_end = deque(maxlen=len)
-        self.oneway = deque(maxlen=len)
-        self.traffic_light_green = deque(maxlen=len)
-        self.traffic_light_yellow = deque(maxlen=len)
-        self.traffic_light_red = deque(maxlen=len)
-        self.person = deque(maxlen=len)
+        length = 5
+        self.lane = deque(maxlen=length)
+        self.dotted_lane = deque(maxlen=length)
+        self.yellow_lane = deque(maxlen=length)
+        self.stop_line = deque(maxlen=length)
+        self.crosswalk = deque(maxlen=length)
+        self.limit_30 = deque(maxlen=length)
+        self.limit_50 = deque(maxlen=length)
+        self.limit_100 = deque(maxlen=length)
+        self.kidzone = deque(maxlen=length)
+        self.section_start = deque(maxlen=length)
+        self.section_end = deque(maxlen=length)
+        self.oneway = deque(maxlen=length)
+        self.traffic_light_green = deque(maxlen=length)
+        self.traffic_light_yellow = deque(maxlen=length)
+        self.traffic_light_red = deque(maxlen=length)
+        self.person = deque(maxlen=length)
 
         # 상태 변수 초기화
         self.lane_status = 0
