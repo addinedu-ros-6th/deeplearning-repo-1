@@ -33,7 +33,7 @@ class LoginDialog(QtWidgets.QDialog):
         try:
             conn = mysql.connector.connect(**db_config)
             cursor = conn.cursor()
-            query = "SELECT * FROM UserData WHERE username=%s AND password=%s"
+            query = "SELECT * FROM UserData WHERE login_id=%s AND password=%s"
             cursor.execute(query, (username, password))
             result = cursor.fetchone()
 
