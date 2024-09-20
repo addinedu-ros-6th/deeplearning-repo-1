@@ -1,5 +1,18 @@
 from collections import deque
 
+'''
+PenaltyData table:
+id  penalty_type                    penalty_score
+1   kidzone_speed_violation         30
+2   section_speed_violation         10
+3   speed_violation                 20
+4   traffic_sign_green_violation    15
+5   traffic_sign_red_violation      15
+6   stop_line_violation             10
+7   lane_violation                  5
+8   human_on_crosswalk_violation    15
+'''
+
 class Judge:
     def __init__(self):
         self.charge = ""
@@ -71,6 +84,8 @@ class Judge:
 
         
     def verdict(self, detects: dict[str: tuple[int, int, int, int]], cls_set: set[int], velocity) -> tuple[str, int]:
+
+        charge_id = 0
 
         self.penalty = 0
         stop_line_over = 10
@@ -176,12 +191,14 @@ class Judge:
         if self.crosswalk_status == 1 and self.person_status == 1 and velocity > 0 and self.crosswalk_prev == 0:
             self.penalty += crosswalk_over   
             self.crosswalk_prev = 1
+            charge_id = 8
             print("crosswalk_over")
 
         # 초록불이고 정지선이 있을 때 속도가 10보다 작으면 -15
         if self.traffic_light_green == 1 and self.stop_line_status == 1 and velocity < 10 and self.green_signal_prev == 0:
             self.penalty += green_signal_over   
             self.green_signal_prev = 1
+            charge_id = 4
             print("green_signal_over")
 
         #  # 구간 단속 50 이상이면 -10
@@ -192,6 +209,7 @@ class Judge:
         if self.limit_100_status == 0 and self.limit_100_status_prev == 1 and velocity > 100:
             self.penalty += speed_limit_100_over   
             self.speed_limit_100_prev = 0
+            charge_id = 3
             print("speed_limit_100_over")
         
         status_mapping = { 'lane': 'lane_status', 'dotted_lane': 'dotted_lane_status', 'yellow_lane': 'yellow_lane_status', 'stop_line': 'stop_line_status',                             
@@ -210,14 +228,16 @@ class Judge:
             self.penalty += stop_line_over   
             self.stop_line_over = 1
             self.stop_line_status_prev = 0
+            charge_id = 5
             print("stop_line_over")
 
         # 어린이보호구역 표지판이 있다가 없어지고 빨간 영역이 있을때 속도가 30 초과이면 -30
         if self.kidzone == 0 and self.kidzone_prev == 1 and self.redzone_status == 1 and velocity > 30 and self.speed_limit_30_prev == 0:
             self.penalty += speed_limit_30_over   
             self.speed_limit_30_prev = 1
+            charge_id = 1
             print("speed_limit_30_over")
         else:
             self.speed_limit_30_prev = 0
 
-        return (self.charge, self.penalty, self.detected_classes, self.is_new_object, self.new_object)
+        return (charge_id, self.penalty, self.detected_classes, self.is_new_object, self.new_object)
