@@ -10,6 +10,7 @@ import socket
 import struct
 import pickle
 import datetime
+import json
 
 from inference import Inference
 from judge import Judge
@@ -26,6 +27,7 @@ TODO
 - 로그 검색기능 완성하기
 - sql 파일 만들기
     - sql 테이블 생성하는 코드 작성하기. 
+- 트랙이랑 통신 뚫기
 - 
 '''
 
@@ -71,6 +73,15 @@ class WindowClass(QMainWindow, from_class):
         self.btn_logout.clicked.connect(self.end_session)
         self.btn_search_1.clicked.connect(self.load_user_db)
         self.btn_search_2.clicked.connect(self.load_admin_db)
+
+        self.tableWidget_1.cellDoubleClicked.connect(self.table1_dclicked)
+        self.tableWidget_2.cellDoubleClicked.connect(self.table2_dclicked)
+
+        # 시간 설정
+        self.dateTime_start_1.setDateTime(QDateTime.currentDateTime())
+        self.dateTime_end_1.setDateTime(QDateTime.currentDateTime())
+        self.dateTime_start_2.setDateTime(QDateTime.currentDateTime())
+        self.dateTime_end_2.setDateTime(QDateTime.currentDateTime())
 
         # 점수 차감
         self.judge = Judge()
@@ -168,11 +179,11 @@ class WindowClass(QMainWindow, from_class):
 
         # 파일 저장을 위한 시간 저장
         self.now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.file_name = self.car_number + '_' + self.now + '_' + count
+        self.file_name = self.car_number + '_' + self.now + '_' + str(count)
 
     def show_frame(self, frame):
         try:
-            frame_boxed, detects, cls_set = self.model.predict(frame)
+            frame_boxed, detects, cls_set, _json = self.model.predict(frame)
 
             frame_boxed = cv2.cvtColor(frame_boxed, cv2.COLOR_BGR2RGB)
             h, w, c = frame_boxed.shape
@@ -197,7 +208,7 @@ class WindowClass(QMainWindow, from_class):
             
             # 새로운 객체 감지 시 DB 업로드
             for e in self.new_object:
-                self.upload_new_object_data(e)
+                self.upload_new_object_data(e, _json)
                 cv2.imwrite(self.path_admin+self.file_name, frame)
 
         except Exception as e:
@@ -207,8 +218,22 @@ class WindowClass(QMainWindow, from_class):
         insert = f"insert into PenaltyLog values ({self.now}, {self.user_id}, {self.charge_id}, {self.velocity})"
         self.cursor.execute(insert)
     
-    def upload_new_object_data(self, _object):
-        insert = f"insert into ObjectLog values ({self.now}, {_object}, {self.car_number}, {self.path_admin}, {self._json}, {self.file_name})"
+    def upload_new_object_data(self, _object, _json):
+        # json 파일 처리
+        # list[list[dict[]]]
+        # json_new = []
+        # for json_list in _json:
+        #     json_indi_new = []
+        #     for dict in json_list:
+        #         json_indi_new.append({key: dict[key] for key in ['name', 'class', 'confidence', 'box']})
+        #     json_new.append(json_indi_new)
+
+        json_new = []
+        for json_list in _json:
+            for dict in json_list:
+                json_new.append({key: dict[key] for key in ['name', 'class', 'confidence', 'box']})
+            
+        insert = f"insert into ObjectLog values ({self.now}, {_object}, {self.car_number}, {self.path_admin}, {json_new}, {self.file_name})"
         self.cursor.execute(insert)
 
     def update_label(self, detected_classes):
@@ -217,9 +242,39 @@ class WindowClass(QMainWindow, from_class):
         self.label_status_desc.setText(f"Detected Classes: {label_text}")
     
     def load_user_db(self):
-        query = f"select "
-    
+        f'''
+        select pl.time, pl.user_id, pl.speed, pd.penalty_type, pd.penalty_score, pl.score, pl.image_path, pl.image_name, pl.json_data from PenaltyLog pl, PenaltyData pd where pl.user_id = {self.user_id} and pl.penalty_id = pd.id
+        '''
+        query = f"select * from PenaltyLog;"
+        self.cursor.execute(query)
+        results = self.cursor.fetchall()
+
+        print(type(results))
+        print(results)
+        print()
+
+        for result, i in enumerate(results):
+            print(result)
+            print()
+            
+            date_time, user_id, penalty_id, speed, image_name, image_path, json_data, score = result
+            self.tableWidget_1.setItem(i, 0, date_time)
+            self.tableWidget_1.setItem(i, 1, self.car_number)
+            self.tableWidget_1.setItem(i, 2, self.score)
+            self.tableWidget_1.setItem(i, 3, penalty_type)
+            self.tableWidget_1.setItem(i, 4, penalty_score)
+            self.tableWidget_1.setItem(i, 5, speed)
+
+
+
+
     def load_admin_db(self):
+        pass
+    
+    def table1_dclicked(self):
+        pass
+
+    def table2_dclicked(self):
         pass
 
     def end_session(self):
