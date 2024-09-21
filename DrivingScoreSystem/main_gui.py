@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QDialog
-from PyQt5.QtCore import QSocketNotifier, QObject
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QTableWidgetItem, QDialog
+from PyQt5.QtCore import QSocketNotifier
 from PyQt5.QtGui import *
 from PyQt5 import uic
 from PyQt5.QtCore import *
@@ -82,6 +82,11 @@ class WindowClass(QMainWindow, from_class):
         self.dateTime_end_1.setDateTime(QDateTime.currentDateTime())
         self.dateTime_start_2.setDateTime(QDateTime.currentDateTime())
         self.dateTime_end_2.setDateTime(QDateTime.currentDateTime())
+
+        # 표 설정
+        self.tableWidget_1.setColumnHidden(6, True)
+        self.tableWidget_1.setColumnHidden(7, True)
+        self.tableWidget_1.setColumnHidden(8, True)
 
         # 점수 차감
         self.judge = Judge()
@@ -242,37 +247,80 @@ class WindowClass(QMainWindow, from_class):
         self.label_status_desc.setText(f"Detected Classes: {label_text}")
     
     def load_user_db(self):
-        f'''
-        select pl.time, pl.user_id, pl.speed, pd.penalty_type, pd.penalty_score, pl.score, pl.image_path, pl.image_name, pl.json_data from PenaltyLog pl, PenaltyData pd where pl.user_id = {self.user_id} and pl.penalty_id = pd.id
-        '''
-        query = f"select * from PenaltyLog;"
+        # f'''
+        # select pl.time, pl.user_id, pl.speed, pd.penalty_type, pd.penalty_score, \
+        #     pl.score, pl.image_path, pl.image_name, pl.json_data \
+        #     from PenaltyLog pl, PenaltyData pd \
+        #     where pl.user_id = {self.user_id} and pl.penalty_id = pd.id;
+        # '''
+        query = f"select pl.time, pl.user_id, pl.speed, pd.penalty_type, pd.penalty_score, \
+                    pl.score, pl.image_path, pl.image_name, pl.json_data \
+                    from PenaltyLog pl, PenaltyData pd \
+                    where pl.user_id = {self.user_id} and pl.penalty_id = pd.id;"
         self.cursor.execute(query)
         results = self.cursor.fetchall()
 
-        print(type(results))
-        print(results)
-        print()
+        self.tableWidget_1.setRowCount(len(results))
 
-        for result, i in enumerate(results):
-            print(result)
-            print()
+        # print("results:")
+        # print(results)
+        # print()
+
+        for i, result in enumerate(results):
+            # print("i:", i)
+            # print("result:")
+            # print(result)
+            # print()
             
-            date_time, user_id, penalty_id, speed, image_name, image_path, json_data, score = result
-            self.tableWidget_1.setItem(i, 0, date_time)
-            self.tableWidget_1.setItem(i, 1, self.car_number)
-            self.tableWidget_1.setItem(i, 2, self.score)
-            self.tableWidget_1.setItem(i, 3, penalty_type)
-            self.tableWidget_1.setItem(i, 4, penalty_score)
-            self.tableWidget_1.setItem(i, 5, speed)
-
-
-
+            date_time, user_id, speed, penalty_type, penalty_score, score, image_path, image_name, json_data = result
+            date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
+            self.tableWidget_1.setItem(i, 0, QTableWidgetItem(date_time_str))
+            self.tableWidget_1.setItem(i, 1, QTableWidgetItem(self.car_number))
+            self.tableWidget_1.setItem(i, 2, QTableWidgetItem(str(score)))
+            self.tableWidget_1.setItem(i, 3, QTableWidgetItem(penalty_type))
+            self.tableWidget_1.setItem(i, 4, QTableWidgetItem(str(penalty_score)))
+            self.tableWidget_1.setItem(i, 5, QTableWidgetItem(str(speed)))
+            self.tableWidget_1.setItem(i, 6, QTableWidgetItem(image_path))
+            self.tableWidget_1.setItem(i, 7, QTableWidgetItem(image_name))
+            self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
 
     def load_admin_db(self):
         pass
     
-    def table1_dclicked(self):
-        pass
+    def table1_dclicked(self, row, col):
+        image_path = self.tableWidget_1.item(row, 6).text()
+        image_name = self.tableWidget_1.item(row, 7).text()
+        json_data = json.loads(self.tableWidget_1.item(row, 8).text())
+        print("type(json_data):", type(json_data))
+        print("json_data:", json_data)
+
+        # 이미지에 박스 그리고 보여주기
+        image = cv2.imread(image_path+image_name)
+        for i, data in enumerate(json_data):
+            cls = data['name']
+            conf = data['confidence']
+            x1, x2, y1, y2 = data['box'].values()
+            x1 = int(x1)
+            x2 = int(x2)
+            y1 = int(y1)
+            y2 = int(y2)
+
+            # 바운딩 박스 그리기
+            print("x1:", x1, "y1:", y1, "x2:", x2, "y2:", y2)
+            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
+
+            # 점수 텍스트 표시
+            label = f'{conf:.2f}'
+            cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 2)
+
+            # 클래스 표시
+            cv2.putText(image, cls, (x1 + 40, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
+        
+        h, w, c = image.shape
+        qimage = QImage(image, w, h, w * c, QImage.Format_RGB888)
+        self.pixmap_monitor_userlog = QPixmap.fromImage(qimage)
+        self.pixmap_monitor_userlog = self.pixmap_monitor_userlog.scaled(self.label_preview_1.width(), self.label_preview_1.height())
+        self.label_preview_1.setPixmap(self.pixmap_monitor_userlog)
 
     def table2_dclicked(self):
         pass
