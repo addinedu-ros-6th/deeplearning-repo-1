@@ -83,7 +83,7 @@ class Judge:
         self.detected_classes = set()
 
         
-    def verdict(self, detects: dict[str: tuple[int, int, int, int]], cls_set: set[int], velocity) -> tuple[str, int]:
+    def verdict(self, detects: dict[str: tuple[int, int, int, int]], cls_set: set[int], velocity, frame) -> tuple[str, int]:
 
         charge_id = 0
 

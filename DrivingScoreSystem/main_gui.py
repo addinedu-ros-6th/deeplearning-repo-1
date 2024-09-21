@@ -193,7 +193,7 @@ class WindowClass(QMainWindow, from_class):
             self.label.setPixmap(self.pixmap_monitor)
 
             # 점수 차감
-            self.charge_id, self.penalty, detected_classes, self.is_new_object, self.new_object = self.judge.verdict(detects, cls_set, self.velocity)
+            self.charge_id, self.penalty, detected_classes, self.is_new_object, self.new_object = self.judge.verdict(detects, cls_set, self.velocity, frame)
             # self.update_label(detected_classes)
             
             if self.penalty:
