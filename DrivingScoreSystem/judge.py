@@ -1,4 +1,7 @@
 from collections import deque
+from ultralytics import YOLO
+import numpy as np
+import cv2
 
 '''
 PenaltyData table:
@@ -76,10 +79,15 @@ class Judge:
         self.is_new_object = False
         self.new_object = set()
        
-        self.detected = [self.lane, self.dotted_lane, self.yellow_lane, self.stop_line, self.crosswalk, self.limit_30, self.limit_50, 
-                         self.limit_100, self.kidzone, self.section_start, self.section_end, self.oneway, 
-                         self.traffic_light_green, self.traffic_light_yellow, self.traffic_light_red, self.person]
+        # self.detected = [self.lane, self.dotted_lane, self.yellow_lane, self.stop_line, self.crosswalk, self.limit_30, self.limit_50, 
+        #                  self.limit_100, self.kidzone, self.section_start, self.section_end, self.oneway, 
+        #                  self.traffic_light_green, self.traffic_light_yellow, self.traffic_light_red, self.person]
         
+        self.detected = [self.lane, self.dotted_lane, self.limit_100, self.traffic_light_green, 
+                         self.crosswalk, self.oneway, self.section_start, self.stop_line, 
+                         self.traffic_light_red, self.kidzone, self.limit_30, self.person, 
+                         self.traffic_light_yellow, self.yellow_lane, self.limit_50, self.section_end]
+
         self.detected_classes = set()
 
         
@@ -186,7 +194,52 @@ class Judge:
                 elif cls == "person" and (len(self.person) == 5):
                     if area > 10000:
                         self.person_status = 1
-              
+
+        if (self.kidzone_status == 1) or (self.redzone_status == 1):
+            # Create a mask to exclude white regions
+            # hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            # lower_white = np.array([0, 0, 200])  # Lower bound for white
+            # upper_white = np.array([180, 25, 255])  # Upper bound for white
+            # # white_mask = cv2.inRange(hsv_frame, lower_white, upper_white)
+
+            # Invert the mask to get non-white areas
+            # non_white_mask = cv2.bitwise_not(white_mask)
+
+            # Step 2: Detect red lane markers only
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            lower_red1 = np.array([0, 100, 100])
+            upper_red1 = np.array([10, 255, 255])
+            lower_red2 = np.array([160, 100, 100])
+            upper_red2 = np.array([180, 255, 255])
+
+            red_mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
+            red_mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
+            red_mask = cv2.bitwise_or(red_mask1, red_mask2)
+
+            # 노이즈 제거
+            kernel = np.ones((5,5), np.uint8)
+            red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
+            red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_CLOSE, kernel)
+
+            # Exclude white areas from red mask
+            # red_mask = cv2.bitwise_and(red_mask, non_white_mask)
+
+            # Find and draw contours for lane markers
+            contours, _ = cv2.findContours(red_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            for contour in contours:
+                area = cv2.contourArea(contour)
+                if area > 4000:  # Ignore small noise
+                    # print("YES", "kidzone_status:", self.kidzone_status, "redzone_status:", self.redzone_status)
+                    self.redzone_status = 1
+                    x, y, w, h = cv2.boundingRect(contour)
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)  # Blue bounding box for lanes
+                else:
+                    # print("No", "kidzone_status:", self.kidzone_status, "redzone_status:", self.redzone_status)
+                    self.redzone_status = 0
+                    # self.kidzone_status = 0
+
+        print("oneway:", self.oneway_status)
+
         # 횡단보도에 사람 있을 때 속도가 있으면 -15
         if self.crosswalk_status == 1 and self.person_status == 1 and velocity > 0 and self.crosswalk_prev == 0:
             self.penalty += crosswalk_over   
@@ -217,6 +270,7 @@ class Judge:
                             'kidzone': 'kidzone_status', 'section_start': 'section_start_status', 'section_end': 'section_end_status',                             
                             'oneway': 'oneway_status', 'traffic_light_green': 'traffic_light_green_status', 'traffic_light_yellow': 'traffic_light_yellow_status',                             
                             'traffic_light_red': 'traffic_light_red_status', 'person': 'person_status'}
+        
 
         # print("self.detected_classes", self.detected_classes)
         for cls in status_mapping:
