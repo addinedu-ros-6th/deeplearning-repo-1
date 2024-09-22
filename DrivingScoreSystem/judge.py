@@ -92,6 +92,7 @@ class Judge:
 
         
     def verdict(self, detects: dict[str: tuple[int, int, int, int]], cls_set: set[int], velocity, frame) -> tuple[str, int]:
+        self.is_new_object = False
 
         charge_id = 0
 
@@ -124,15 +125,16 @@ class Judge:
                 center_y = (y1 + y2) // 2
 
                 # 새로운 객체 감지
-                self.objects_list_prev = self.objects_list
                 self.objects_list.add(cls)
-
-                self.objects_cnt_prev = self.objects_cnt
                 self.objects_cnt = len(self.objects_list)
 
                 if (self.objects_cnt > self.objects_cnt_prev) and (self.objects_list != self.objects_list_prev):
+                    print("new object detected!!!")
                     self.is_new_object = True
                     self.new_object = self.objects_list - self.objects_list_prev
+                
+                self.objects_cnt_prev = self.objects_cnt
+                self.objects_list_prev = self.objects_list
 
                 # print(f"Detected class: {cls}")
                 # print(f"area : {area}")
@@ -238,7 +240,7 @@ class Judge:
                     self.redzone_status = 0
                     # self.kidzone_status = 0
 
-        print("oneway:", self.oneway_status)
+        # print("oneway:", self.oneway_status)
 
         # 횡단보도에 사람 있을 때 속도가 있으면 -15
         if self.crosswalk_status == 1 and self.person_status == 1 and velocity > 0 and self.crosswalk_prev == 0:
