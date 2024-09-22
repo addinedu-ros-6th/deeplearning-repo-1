@@ -21,14 +21,13 @@ import login_gui
 TODO
 - log 기록용 json형식 반환하기
     - json 뭐 들어갈지 정하기
-- Object_Log에서 로그 더블클릭/조회 버튼 누르면 사진 띄우기
 - 어보 빨간색 도로 처리하기
-- 로그 쿼리 작성하기
 - 로그 검색기능 완성하기
 - sql 파일 만들기
     - sql 테이블 생성하는 코드 작성하기. 
 - 트랙이랑 통신 뚫기
 - 활성화 되어있는 탭만 작동하게 하기
+- LCD 색 바뀌는거 작동 확인 하기
 - 
 '''
 
@@ -70,6 +69,9 @@ class WindowClass(QMainWindow, from_class):
         # 추론 객체
         self.model = Inference()
 
+        # 첫번째 탭 열려있을 떄만 영상 받아오기
+        # self.Controll.currentChanged.connect(self.on_tab_change)
+
         # 버튼
         self.btn_logout.clicked.connect(self.end_session)
         self.btn_search_1.clicked.connect(self.load_user_db)
@@ -93,6 +95,9 @@ class WindowClass(QMainWindow, from_class):
         self.tableWidget_2.setColumnHidden(4, True)
         self.tableWidget_2.setColumnHidden(5, True)
 
+        # 점수 lcd 설정
+        self.palette = self.LCD_score.palette()
+
         # 점수 차감
         self.judge = Judge()
 
@@ -114,9 +119,13 @@ class WindowClass(QMainWindow, from_class):
 
     def hide_admin_tab(self):
         self.Controll.removeTab(self.admin_tab_index)
+    
+    # def on_tab_change(self, index):
+    #     if index == 0:
+
 
     def socket_configuration(self, timeout=1):
-        self.host = '192.168.0.15'
+        self.host = '172.30.1.33'
         self.port = 9999
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -207,6 +216,7 @@ class WindowClass(QMainWindow, from_class):
             # self.update_label(detected_classes)
             
             if self.penalty:
+                self.palette.setColor(QPalette.WindowText, QColor(255, 0, 0))
                 self.score += self.penalty
                 print(self.score, self.penalty)
                 self.LCD_score.display(self.score)
@@ -331,8 +341,6 @@ class WindowClass(QMainWindow, from_class):
         image_path = self.tableWidget_2.item(row, 3).text()
         image_name = self.tableWidget_2.item(row, 4).text()
         json_data = json.loads(self.tableWidget_2.item(row, 5).text())
-        print("image_path:", image_path)
-        print("image_name:", image_name)
 
         image = cv2.imread(image_path+image_name)
         for data in json_data:
