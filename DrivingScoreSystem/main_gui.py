@@ -265,16 +265,16 @@ class WindowClass(QMainWindow, from_class):
             self.pixmap_monitor = self.pixmap_monitor.scaled(self.label.width(), self.label.height())
             self.label.setPixmap(self.pixmap_monitor)
 
-                # 점수 차감
-                self.charge_id, self.penalty, detected_classes, self.is_new_object, self.new_object = self.judge.verdict(detects, cls_set, self.velocity, frame)
-                self.update_label(detected_classes)
-                
-                if self.penalty:
-                    self.palette.setColor(QPalette.WindowText, QColor(255, 0, 0))
-                    self.score += self.penalty
-                    print(self.score, self.penalty)
-                    self.LCD_score.display(self.score)
-                    self.label_lastPenalty.setText("-" + str(self.penalty))
+            # 점수 차감
+            self.charge_id, self.penalty, detected_classes, self.is_new_object, self.new_object = self.judge.verdict(detects, cls_set, self.velocity, frame)
+            self.update_label(detected_classes)
+            
+            if self.penalty:
+                self.palette.setColor(QPalette.WindowText, QColor(255, 0, 0))
+                self.score += self.penalty
+                print(self.score, self.penalty)
+                self.LCD_score.display(self.score)
+                self.label_lastPenalty.setText("-" + str(self.penalty))
 
                 # 감점사항 있을 시 DB 업로드
                 self.upload_penalty_data()
