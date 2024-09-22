@@ -237,6 +237,12 @@
        <height>711</height>
       </rect>
      </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::EditKeyPressed</set>
+     </property>
+     <property name="columnCount">
+      <number>9</number>
+     </property>
      <column>
       <property name="text">
        <string>datetime</string>
@@ -265,6 +271,21 @@
      <column>
       <property name="text">
        <string>speed</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>image_path</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>image_name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>json_data</string>
       </property>
      </column>
     </widget>
@@ -395,6 +416,9 @@
        <height>711</height>
       </rect>
      </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::EditKeyPressed</set>
+     </property>
      <column>
       <property name="text">
        <string>datetime</string>
@@ -410,6 +434,21 @@
        <string>object</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>image_path</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>iamge_name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>json_data</string>
+      </property>
+     </column>
     </widget>
     <widget class="QDateTimeEdit" name="dateTime_start_2">
      <property name="geometry">
@@ -421,7 +460,7 @@
       </rect>
      </property>
      <property name="displayFormat">
-      <string>yy. M. d.  h:mm</string>
+      <string>yy. M. d.  AP h:mm</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_4">
