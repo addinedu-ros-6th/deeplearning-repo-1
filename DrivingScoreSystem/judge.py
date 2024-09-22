@@ -53,6 +53,23 @@ class Judge:
         self.traffic_light_red_status = 0
         self.person_status = 0
         self.redzone_status = 0
+         # 미감지 변수 초기화
+        self.lane_miss_count = 0
+        self.dotted_lane_miss_count = 0
+        self.yellow_lane_miss_count = 0
+        self.stop_line_miss_count = 0
+        self.crosswalk_miss_count = 0
+        self.limit_30_miss_count = 0
+        self.limit_50_miss_count = 0
+        self.limit_100_miss_count = 0
+        self.kidzone_miss_count = 0
+        self.section_start_miss_count = 0
+        self.section_end_miss_count = 0
+        self.oneway_miss_count = 0
+        self.traffic_light_green_miss_count = 0
+        self.traffic_light_yellow_miss_count = 0
+        self.traffic_light_red_miss_count = 0
+        self.person_miss_count = 0
 
         self.stop_line_status_prev = 0
         self.kidzone_prev = 0
@@ -77,23 +94,29 @@ class Judge:
         self.new_object = set()
        
         self.detected = [self.lane, self.dotted_lane, self.yellow_lane, self.stop_line, self.crosswalk, self.limit_30, self.limit_50, 
-                         self.limit_100, self.kidzone, self.section_start, self.section_end, self.oneway, 
-                         self.traffic_light_green, self.traffic_light_yellow, self.traffic_light_red, self.person]
+                        self.limit_100, self.kidzone, self.section_start, self.section_end, self.oneway, 
+                        self.traffic_light_green, self.traffic_light_yellow, self.traffic_light_red, self.person]
+    
         
-        self.detected_classes = set()
+    def verdict(self, detects: dict[str: tuple[int, int, int, int]], cls_set: set[int], velocity, section_speed) -> tuple[str, int]:
 
-        
-    def verdict(self, detects: dict[str: tuple[int, int, int, int]], cls_set: set[int], velocity) -> tuple[str, int]:
+        self.detected_classes = set()
 
         charge_id = 0
 
+        detect_count = 4
+        undetected_count = 3
+
+        kidzone_speed_violation = 30
+        section_speed_violation = 10
+        speed_violation = 20
+        traffic_sign_green_violation = 15
+        traffic_sign_red_violation = 15
+        stop_line_violation = 10
+        lane_violation = 5
+        human_on_crosswalk_violation = 15
+   
         self.penalty = 0
-        stop_line_over = 10
-        crosswalk_over = 15
-        speed_limit_30_over = 30
-        speed_limit_50_over = 10
-        speed_limit_100_over = 20
-        green_signal_over = 15
 
         # 탐지된 객체 업데이트
         for idx in range(len(self.detected)):
@@ -129,115 +152,145 @@ class Judge:
                 # print(f"Detected class: {cls}")
                 # print(f"area : {area}")
 
-                if cls == "lane" and (len(self.lane) == 5):
+                if cls == "lane" and (len(self.lane) == 5) and (self.lane.count(True) >= detect_count):
                     self.lane_status = 1
                     
-                elif cls == "dotted_lane" and (len(self.dotted_lane) == 5):
+                elif cls == "dotted_lane" and (len(self.dotted_lane) == 5) and (self.dotted_lane.count(True) >= detect_count):
                     self.dotted_lane_status = 1
 
-                elif cls == "yellow_lane" and (len(self.yellow_lane) == 5):
+                elif cls == "yellow_lane" and (len(self.yellow_lane) == 5) and (self.yellow_lane.count(True) >= detect_count):
                     self.yellow_lane_status = 1
 
-                elif cls == "stop_line" and (len(self.stop_line) == 5):
-                    if area > 13000:    
+                elif cls == "stop_line" and (len(self.stop_line) == 5) and (self.stop_line.count(True) >= detect_count):
+                    if area > 10000:    
                         self.stop_line_status = 1
                         self.stop_line_status_prev = 1
 
-                elif cls == "crosswalk" and (len(self.crosswalk) == 5):
-                    if area > 55000:
+                elif cls == "crosswalk" and (len(self.crosswalk) == 5) and (self.crosswalk.count(True) >= detect_count):
+                    if area > 50000:
                         self.crosswalk_status = 1
 
-                elif cls == "limit_30" and (len(self.limit_30) == 5):
+                elif cls == "limit_30" and (len(self.limit_30) == 5) and (self.limit_30.count(True) >= detect_count):
                     self.limit_30_status = 1  
                     self.limit = 30
 
-                elif cls == "limit_50" and (len(self.limit_50) == 5):
+                elif cls == "limit_50" and (len(self.limit_50) == 5) and (self.limit_50.count(True) >= detect_count):
                     self.limit_50_status = 1 
                     self.limit = 50
 
-                elif cls == "limit_100" and (len(self.limit_100) == 5):
+                elif cls == "limit_100" and (len(self.limit_100) == 5) and (self.limit_100.count(True) >= detect_count):
                     self.limit_100_status = 1
                     self.limit_100_status_prev = 1
                     self.limit = 100
 
-                elif cls == "kidzone" and (len(self.kidzone) == 5):
+                elif cls == "kidzone" and (len(self.kidzone) == 5) and (self.kidzone.count(True) >= detect_count):
                     self.kidzone_status = 1  
                     self.kidzone_prev = 1
 
-                elif cls == "section_start" and (len(self.section_start) == 5):
+                elif cls == "section_start" and (len(self.section_start) == 5) and (self.section_start.count(True) >= detect_count):
                     self.section_start_status = 1  
 
-                elif cls == "section_end" and (len(self.section_end) == 5):
+                elif cls == "section_end" and (len(self.section_end) == 5) and (self.section_end.count(True) >= detect_count):
                     self.section_end_status = 1  
 
-                elif cls == "oneway" and (len(self.oneway) == 5):
+                elif cls == "oneway" and (len(self.oneway) == 5) and (self.oneway.count(True) >= detect_count):
                     self.oneway_status = 1  
 
-                elif cls == "traffic_light_green" and (len(self.traffic_light_green) == 5):
+                elif cls == "traffic_light_green" and (len(self.traffic_light_green) == 5) and (self.traffic_light_green.count(True) >= detect_count):
                     self.traffic_light_green_status = 1  
 
-                elif cls == "traffic_light_yellow" and (len(self.traffic_light_yellow) == 5):
+                elif cls == "traffic_light_yellow" and (len(self.traffic_light_yellow) == 5) and (self.traffic_light_yellow.count(True) >= detect_count):
                     self.traffic_light_yellow_status = 1  
 
-                elif cls == "traffic_light_red" and (len(self.traffic_light_red) == 5):
+                elif cls == "traffic_light_red" and (len(self.traffic_light_red) == 5) and (self.traffic_light_red.count(True) >= detect_count):
                     # if area > 1100:
                     self.traffic_light_red_status = 1
                        
-                elif cls == "person" and (len(self.person) == 5):
+                elif cls == "person" and (len(self.person) == 5) and (self.person.count(True) >= detect_count):
                     if area > 10000:
                         self.person_status = 1
               
         # 횡단보도에 사람 있을 때 속도가 있으면 -15
-        if self.crosswalk_status == 1 and self.person_status == 1 and velocity > 0 and self.crosswalk_prev == 0:
-            self.penalty += crosswalk_over   
-            self.crosswalk_prev = 1
+        if self.crosswalk_status == 1 and self.person_status == 1 and velocity > 0 and self.human_on_crosswalk_violation_prev == 0:
+            self.penalty += human_on_crosswalk_violation   
+            self.human_on_crosswalk_violation_prev = 1
             charge_id = 8
-            print("crosswalk_over")
+            print("human_on_crosswalk_violation")
 
         # 초록불이고 정지선이 있을 때 속도가 10보다 작으면 -15
-        if self.traffic_light_green == 1 and self.stop_line_status == 1 and velocity < 10 and self.green_signal_prev == 0:
-            self.penalty += green_signal_over   
-            self.green_signal_prev = 1
+        if self.traffic_light_green == 1 and self.stop_line_status == 1 and velocity < 10 and self.traffic_sign_green_violation_prev == 0:
+            self.penalty += traffic_sign_green_violation   
+            self.traffic_sign_green_violation_prev = 1
             charge_id = 4
-            print("green_signal_over")
+            print("traffic_sign_green_violation")
 
-        #  # 구간 단속 50 이상이면 -10
-        # if self.section_velocity > 30: 
-        #     self.penalty += speed_limit_50_over   
+         # 구간 단속 50 이상이면 -10
+        if int(section_speed) > 30: 
+            self.penalty += section_speed_violation
+            print("section_speed_violation")   
 
         # 100 표지판이 보였다가 안보였을 때 속도가 100 이상이면 -10
         if self.limit_100_status == 0 and self.limit_100_status_prev == 1 and velocity > 100:
-            self.penalty += speed_limit_100_over   
-            self.speed_limit_100_prev = 0
+            self.penalty += speed_violation   
+            self.speed_violation_prev = 0
             charge_id = 3
-            print("speed_limit_100_over")
+            print("speed_violation")
         
-        status_mapping = { 'lane': 'lane_status', 'dotted_lane': 'dotted_lane_status', 'yellow_lane': 'yellow_lane_status', 'stop_line': 'stop_line_status',                             
-                            'crosswalk': 'crosswalk_status', 'limit_30': 'limit_30_status', 'limit_50': 'limit_50_status', 'limit_100': 'limit_100_status',                             
-                            'kidzone': 'kidzone_status', 'section_start': 'section_start_status', 'section_end': 'section_end_status',                             
-                            'oneway': 'oneway_status', 'traffic_light_green': 'traffic_light_green_status', 'traffic_light_yellow': 'traffic_light_yellow_status',                             
-                            'traffic_light_red': 'traffic_light_red_status', 'person': 'person_status'}
+        # 3번 연속 감지되지 않았을 때 status를 0으로 바꾸는 로직
+        status_mapping = {
+            'lane': ('lane_status', 'lane_miss_count'),
+            'dotted_lane': ('dotted_lane_status', 'dotted_lane_miss_count'),
+            'yellow_lane': ('yellow_lane_status', 'yellow_lane_miss_count'),
+            'stop_line': ('stop_line_status', 'stop_line_miss_count'),
+            'crosswalk': ('crosswalk_status', 'crosswalk_miss_count'),
+            'limit_30': ('limit_30_status', 'limit_30_miss_count'),
+            'limit_50': ('limit_50_status', 'limit_50_miss_count'),
+            'limit_100': ('limit_100_status', 'limit_100_miss_count'),
+            'kidzone': ('kidzone_status', 'kidzone_miss_count'),
+            'section_start': ('section_start_status', 'section_start_miss_count'),
+            'section_end': ('section_end_status', 'section_end_miss_count'),
+            'oneway': ('oneway_status', 'oneway_miss_count'),
+            'traffic_light_green': ('traffic_light_green_status', 'traffic_light_green_miss_count'),
+            'traffic_light_yellow': ('traffic_light_yellow_status', 'traffic_light_yellow_miss_count'),
+            'traffic_light_red': ('traffic_light_red_status', 'traffic_light_red_miss_count'),
+            'person': ('person_status', 'person_miss_count')
+        }
 
-        # print("self.detected_classes", self.detected_classes)
-        for cls in status_mapping:
+        for cls, (status_attr, miss_count_attr) in status_mapping.items():
             if cls not in self.detected_classes:
-                setattr(self, status_mapping[cls], 0)
+                # 감지되지 않으면 miss 카운터 증가
+                miss_count = getattr(self, miss_count_attr)
+                miss_count += 1
+                setattr(self, miss_count_attr, miss_count)
 
-        # 신호등 빨간 불일 때 정지선이 있었다가 없으면 -10
-        if self.traffic_light_red_status == 1 and self.stop_line_status == 0 and self.stop_line_status_prev == 1 and self.stop_line_prev == 0:
-            self.penalty += stop_line_over   
-            self.stop_line_over = 1
-            self.stop_line_status_prev = 0
+                # 3번 연속 감지되지 않았을 때 status를 0으로 변경
+                if miss_count >= undetected_count:
+                    setattr(self, status_attr, 0)
+            else:
+                # 감지되면 miss 카운터 리셋
+                setattr(self, miss_count_attr, 0)
+
+        # 신호등 빨간 불일 때 정지선이 있었다가 없을때 속도가 있으면 -15
+        if self.traffic_light_red_status == 1 and self.stop_line_status == 0 and self.stop_line_status_prev == 1 and velocity > 0 and self.traffic_sign_red_violation_prev == 0:
+            self.penalty += traffic_sign_red_violation   
+            self.traffic_sign_red_violation_prev = 0
             charge_id = 5
-            print("stop_line_over")
+            print("traffic_sign_red_violation")
+
+        # 신호등 빨간 불일 때 정지선이 있었다가 없을때 속도가 0이면 -10
+        if self.traffic_light_red_status == 1 and self.stop_line_status == 0 and self.stop_line_status_prev == 1 and velocity == 0 and self.stop_line_violation_prev == 0:
+            self.penalty += stop_line_violation   
+            self.stop_line_violation_prev = 0
+            charge_id = 5
+            print("traffic_sign_red_violation")
 
         # 어린이보호구역 표지판이 있다가 없어지고 빨간 영역이 있을때 속도가 30 초과이면 -30
-        if self.kidzone == 0 and self.kidzone_prev == 1 and self.redzone_status == 1 and velocity > 30 and self.speed_limit_30_prev == 0:
-            self.penalty += speed_limit_30_over   
-            self.speed_limit_30_prev = 1
+        if self.kidzone == 0 and self.kidzone_prev == 1 and self.redzone_status == 1 and velocity > 30 and self.kidzone_speed_violation_30_prev == 0:
+            self.penalty += kidzone_speed_violation   
+            self.kidzone_speed_violation_30_prev = 1
             charge_id = 1
-            print("speed_limit_30_over")
+            print("kidzone_speed_violation")
         else:
-            self.speed_limit_30_prev = 0
+            self.kidzone_speed_violation_30_prev = 0
 
         return (charge_id, self.penalty, self.detected_classes, self.is_new_object, self.new_object)
