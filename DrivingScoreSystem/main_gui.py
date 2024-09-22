@@ -11,6 +11,7 @@ import struct
 import pickle
 import datetime
 import json
+import ast
 
 from inference import Inference
 from judge import Judge
@@ -41,6 +42,10 @@ class WindowClass(QMainWindow, from_class):
         self.user_id = id
         self.car_number = number
         self.label_car_number.setText(number)
+
+        self.object_data = {"lane": 1, "yellow_lane": 2, "stop_line": 3, "kidzone": 4, "sectoin_start": 5, "section_end": 6, "limit_30": 7, "limit_50": 8, 
+                           "limit_100": 9, "oneway": 10, "dotted_lane": 11, "traffic_light_red": 12, "traffic_light_yellow": 13, "traffic_light_green": 14, 
+                           "person": 15}
 
         # 어드민 여부
         self.admin_tab_index = 2
@@ -198,47 +203,56 @@ class WindowClass(QMainWindow, from_class):
 
         # 파일 저장을 위한 시간 저장
         self.now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.file_name = self.car_number + '_' + self.now + '_' + str(count)
+        self.file_name = self.car_number + '_' + self.now + '_' + str(count) + '.jpg'
 
     def show_frame(self, frame):
-        try:
-            frame_boxed, detects, cls_set, _json = self.model.predict(frame)
+        # try:
+        frame_boxed, detects, cls_set, _json = self.model.predict(frame)
 
-            frame_boxed = cv2.cvtColor(frame_boxed, cv2.COLOR_BGR2RGB)
-            h, w, c = frame_boxed.shape
-            qimage = QImage(frame_boxed.data, w, h, w * c, QImage.Format_RGB888)
-            self.pixmap_monitor = QPixmap.fromImage(qimage)
-            self.pixmap_monitor = self.pixmap_monitor.scaled(self.label.width(), self.label.height())
-            self.label.setPixmap(self.pixmap_monitor)
+        frame_boxed = cv2.cvtColor(frame_boxed, cv2.COLOR_BGR2RGB)
+        h, w, c = frame_boxed.shape
+        qimage = QImage(frame_boxed.data, w, h, w * c, QImage.Format_RGB888)
+        self.pixmap_monitor = QPixmap.fromImage(qimage)
+        self.pixmap_monitor = self.pixmap_monitor.scaled(self.label.width(), self.label.height())
+        self.label.setPixmap(self.pixmap_monitor)
 
-            # 점수 차감
-            self.charge_id, self.penalty, detected_classes, self.is_new_object, self.new_object = self.judge.verdict(detects, cls_set, self.velocity, frame)
-            # self.update_label(detected_classes)
-            
-            if self.penalty:
-                self.palette.setColor(QPalette.WindowText, QColor(255, 0, 0))
-                self.score += self.penalty
-                print(self.score, self.penalty)
-                self.LCD_score.display(self.score)
-                self.label_lastPenalty.setText("-" + str(self.penalty))
+        # 점수 차감
+        self.charge_id, self.penalty, detected_classes, self.is_new_object, self.new_object = self.judge.verdict(detects, cls_set, self.velocity, frame)
+        # print()
+        # print("is_new_object:", self.is_new_object)
+        # print()
+        # self.update_label(detected_classes)
+        
+        if self.penalty:
+            self.palette.setColor(QPalette.WindowText, QColor(255, 0, 0))
+            self.score += self.penalty
+            print(self.score, self.penalty)
+            self.LCD_score.display(self.score)
+            self.label_lastPenalty.setText("-" + str(self.penalty))
 
-                # 감점사항 있을 시 DB 업로드
-                self.upload_penalty_data()
-                cv2.imwrite(self.path_user+self.file_name, frame)
-            
-            # 새로운 객체 감지 시 DB 업로드
+            # 감점사항 있을 시 DB 업로드
+            self.upload_penalty_data()
+            cv2.imwrite(self.path_user+self.file_name, frame)
+        
+        # 새로운 객체 감지 시 DB 업로드
+        if self.is_new_object:
             for e in self.new_object:
-                self.upload_new_object_data(e, _json)
+                print()
+                print("new object detected!!!!!!!")
+                print()
+                object_id = self.object_data[e]
+                self.upload_new_object_data(object_id, _json)
                 cv2.imwrite(self.path_admin+self.file_name, frame)
 
-        except Exception as e:
-            print(f"Error in show_frame: {e}")
+        # except Exception as e:
+        #     print(f"Error in show_frame: {e}")
     
     def upload_penalty_data(self):
         insert = f"insert into PenaltyLog values ({self.now}, {self.user_id}, {self.charge_id}, {self.velocity})"
         self.cursor.execute(insert)
+        self.conn.commit()
     
-    def upload_new_object_data(self, _object, _json):
+    def upload_new_object_data(self, object_id, _json):
         # json 파일 처리
         # list[list[dict[]]]
         # json_new = []
@@ -248,13 +262,32 @@ class WindowClass(QMainWindow, from_class):
         #         json_indi_new.append({key: dict[key] for key in ['name', 'class', 'confidence', 'box']})
         #     json_new.append(json_indi_new)
 
+        print("type(_json):", type(_json))
+        print("_json:", _json)
+        print()
+
         json_new = []
         for json_list in _json:
-            for dict in json_list:
-                json_new.append({key: dict[key] for key in ['name', 'class', 'confidence', 'box']})
+            print("type(json_list):", type(json_list))
+            print("json_list:", json_list) 
+            print()
+            for _dict in json_list:
+                print("type(_dict):", type(_dict))
+                print("_dict:", _dict)
+                print()
+                json_new.append({key: _dict[key] for key in ['name', 'class', 'confidence', 'box']})
             
-        insert = f"insert into ObjectLog values ({self.now}, {_object}, {self.car_number}, {self.path_admin}, {json_new}, {self.file_name})"
+        print("json_new:", json_new)
+        print()
+
+        # json_new = json.dumps(json_new)
+
+        # insert = f"insert into ObjectLog values ('{self.now}', '{_object}', '{self.car_number}', '{self.path_admin}', '{json_new}', '{self.file_name}')"
+        insert = f'''insert into ObjectLog values ('{self.now}', {self.user_id}, {object_id}, '{self.path_admin}', """{json_new}""", '{self.file_name}')'''
+        print("insert:", insert)
+        print()
         self.cursor.execute(insert)
+        self.conn.commit()
 
     def update_label(self, detected_classes):
         # set 데이터를 문자열로 변환하여 표시 (콤마로 구분)
@@ -340,10 +373,22 @@ class WindowClass(QMainWindow, from_class):
     def table2_dclicked(self, row, col):
         image_path = self.tableWidget_2.item(row, 3).text()
         image_name = self.tableWidget_2.item(row, 4).text()
-        json_data = json.loads(self.tableWidget_2.item(row, 5).text())
+        # print()
+        # print(f'''{self.tableWidget_2.item(row, 5).text().replace("'", '"')}''')
+        # print()
+        json_data = json.loads(self.tableWidget_2.item(row, 5).text().strip())
+        # json_data = json.loads(f'''{self.tableWidget_2.item(row, 5).text().replace("'", '"')}''')
+        # json_data_raw = self.tableWidget_2.item(row, 5).text()
+        # print("type(json_data_raw):", type(json_data_raw))
+        # print("json_data_raw:", json_data_raw)
+        # json_data = ast.literal_eval(json_data_raw)
+        print("type(json_data):", type(json_data))
+        print("json_data:", json_data)
 
         image = cv2.imread(image_path+image_name)
         for data in json_data:
+            print("type(data):", type(data))
+            print("data:", data)
             cls = data['name']
             conf = data['confidence']
             x1, x2, y1, y2 = data['box'].values()
