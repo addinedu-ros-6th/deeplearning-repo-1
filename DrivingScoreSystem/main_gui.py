@@ -105,7 +105,7 @@ class WindowClass(QMainWindow, from_class):
 
         # 점수 차감
         self.judge = Judge()
-
+        self.section_speed = 0
         self.score = 0
         self.LCD_score.display(self.score)
         self.penalty = 0
@@ -242,7 +242,6 @@ class WindowClass(QMainWindow, from_class):
             
             if data_2:
                 self.section_speed = data_2.decode('utf-8').strip()
-                print(f"Received data: {self.section_speed}")
             else:
                 pass
 
@@ -308,7 +307,7 @@ class WindowClass(QMainWindow, from_class):
     def update_label(self, detected_classes):
         # set 데이터를 문자열로 변환하여 표시 (콤마로 구분)
         label_text = ",\n".join(detected_classes)
-        self.label_status_desc.setText(f"Detected Classes: {label_text}")
+        self.label_status_desc.setText(label_text)
     
     def load_user_db(self):
         query = f"select pl.time, pl.user_id, pl.speed, pd.penalty_type, pd.penalty_score, \

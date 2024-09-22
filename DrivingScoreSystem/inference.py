@@ -4,8 +4,8 @@ import cv2
 
 class Inference:
     def __init__(self):
-        self.model_lane = YOLO('../models/best_lane.pt')
-        self.model_sign = YOLO('../models/everything_2.pt')
+        self.model_lane = YOLO('/home/sh/dev_ws/track_lane.pt')
+        self.model_sign = YOLO('/home/sh/dev_ws/track_sign.pt')
 
 
     def predict(self, frame: np.ndarray) -> tuple[np.ndarray, list[dict[str: tuple[int, int, int, int]]], set[int], list[list[dict]]]:
