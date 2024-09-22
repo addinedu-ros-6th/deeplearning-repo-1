@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QDialog
-from PyQt5.QtCore import QSocketNotifier, QObject
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QTableWidgetItem, QDialog
+from PyQt5.QtCore import QSocketNotifier
 from PyQt5.QtGui import *
 from PyQt5 import uic
 from PyQt5.QtCore import *
@@ -11,6 +11,7 @@ import socket
 import struct
 import pickle
 import datetime
+import json
 
 from inference import Inference
 from judge import Judge
@@ -21,12 +22,13 @@ import login_gui
 TODO
 - log 기록용 json형식 반환하기
     - json 뭐 들어갈지 정하기
-- Object_Log에서 로그 더블클릭/조회 버튼 누르면 사진 띄우기
 - 어보 빨간색 도로 처리하기
-- 로그 쿼리 작성하기
 - 로그 검색기능 완성하기
 - sql 파일 만들기
     - sql 테이블 생성하는 코드 작성하기. 
+- 트랙이랑 통신 뚫기
+- 활성화 되어있는 탭만 작동하게 하기
+- LCD 색 바뀌는거 작동 확인 하기
 - 
 '''
 
@@ -72,10 +74,34 @@ class WindowClass(QMainWindow, from_class):
         # 추론 객체
         self.model = Inference()
 
+        # 첫번째 탭 열려있을 떄만 영상 받아오기
+        # self.Controll.currentChanged.connect(self.on_tab_change)
+
         # 버튼
         self.btn_logout.clicked.connect(self.end_session)
         self.btn_search_1.clicked.connect(self.load_user_db)
         self.btn_search_2.clicked.connect(self.load_admin_db)
+
+        self.tableWidget_1.cellDoubleClicked.connect(self.table1_dclicked)
+        self.tableWidget_2.cellDoubleClicked.connect(self.table2_dclicked)
+
+        # 시간 설정
+        self.dateTime_start_1.setDateTime(QDateTime.currentDateTime())
+        self.dateTime_end_1.setDateTime(QDateTime.currentDateTime())
+        self.dateTime_start_2.setDateTime(QDateTime.currentDateTime())
+        self.dateTime_end_2.setDateTime(QDateTime.currentDateTime())
+
+        # 표 설정
+        self.tableWidget_1.setColumnHidden(6, True)
+        self.tableWidget_1.setColumnHidden(7, True)
+        self.tableWidget_1.setColumnHidden(8, True)
+
+        self.tableWidget_2.setColumnHidden(3, True)
+        self.tableWidget_2.setColumnHidden(4, True)
+        self.tableWidget_2.setColumnHidden(5, True)
+
+        # 점수 lcd 설정
+        self.palette = self.LCD_score.palette()
 
         # 점수 차감
         self.judge = Judge()
@@ -97,6 +123,10 @@ class WindowClass(QMainWindow, from_class):
 
     def hide_admin_tab(self):
         self.Controll.removeTab(self.admin_tab_index)
+    
+    # def on_tab_change(self, index):
+    #     if index == 0:
+
 
     def socket_configuration(self, timeout=1):
         self.host = '172.30.1.33'
@@ -218,23 +248,24 @@ class WindowClass(QMainWindow, from_class):
 
         except ConnectionError as e:
             print(f"Connection error: {e}")
-            
+
     def show_frame(self, frame):
         try:
-            frame, detects, cls_set = self.model.predict(frame)
+            frame_boxed, detects, cls_set, _json = self.model.predict(frame)
 
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            h, w, c = frame.shape
-            qimage = QImage(frame.data, w, h, w*c, QImage.Format_RGB888)
+            frame_boxed = cv2.cvtColor(frame_boxed, cv2.COLOR_BGR2RGB)
+            h, w, c = frame_boxed.shape
+            qimage = QImage(frame_boxed.data, w, h, w * c, QImage.Format_RGB888)
             self.pixmap_monitor = QPixmap.fromImage(qimage)
             self.pixmap_monitor = self.pixmap_monitor.scaled(self.label.width(), self.label.height())
             self.label.setPixmap(self.pixmap_monitor)
 
             # 점수 차감
-            self.charge_id, self.penalty, detected_classes, self.is_new_object, self.new_object  = self.judge.verdict(detects, cls_set, self.velocity, self.section_speed)
+            self.charge_id, self.penalty, detected_classes, self.is_new_object, self.new_object = self.judge.verdict(detects, cls_set, self.velocity, frame, self.section_speed)
             self.update_label(detected_classes)
-
+            
             if self.penalty:
+                self.palette.setColor(QPalette.WindowText, QColor(255, 0, 0))
                 self.score += self.penalty
                 print(self.score, self.penalty)
                 self.LCD_score.display(self.score)
@@ -246,7 +277,7 @@ class WindowClass(QMainWindow, from_class):
             
             # 새로운 객체 감지 시 DB 업로드
             for e in self.new_object:
-                self.upload_new_object_data(e)
+                self.upload_new_object_data(e, _json)
                 cv2.imwrite(self.path_admin+self.file_name, frame)
 
         except Exception as e:
@@ -256,8 +287,22 @@ class WindowClass(QMainWindow, from_class):
         insert = f"insert into PenaltyLog values ({self.now}, {self.user_id}, {self.charge_id}, {self.velocity})"
         self.cursor.execute(insert)
     
-    def upload_new_object_data(self, _object):
-        insert = f"insert into ObjectLog values ({self.now}, {_object}, {self.car_number}, {self.path_admin}, {self._json}, {self.file_name})"
+    def upload_new_object_data(self, _object, _json):
+        # json 파일 처리
+        # list[list[dict[]]]
+        # json_new = []
+        # for json_list in _json:
+        #     json_indi_new = []
+        #     for dict in json_list:
+        #         json_indi_new.append({key: dict[key] for key in ['name', 'class', 'confidence', 'box']})
+        #     json_new.append(json_indi_new)
+
+        json_new = []
+        for json_list in _json:
+            for dict in json_list:
+                json_new.append({key: dict[key] for key in ['name', 'class', 'confidence', 'box']})
+            
+        insert = f"insert into ObjectLog values ({self.now}, {_object}, {self.car_number}, {self.path_admin}, {json_new}, {self.file_name})"
         self.cursor.execute(insert)
 
     def update_label(self, detected_classes):
@@ -266,10 +311,109 @@ class WindowClass(QMainWindow, from_class):
         self.label_status_desc.setText(f"Detected Classes: {label_text}")
     
     def load_user_db(self):
-        query = f"select "
-    
+        query = f"select pl.time, pl.user_id, pl.speed, pd.penalty_type, pd.penalty_score, \
+                    pl.score, pl.image_path, pl.image_name, pl.json_data \
+                    from PenaltyLog pl, PenaltyData pd \
+                    where (pl.user_id = {self.user_id}) and (pl.penalty_id = pd.id);"
+        self.cursor.execute(query)
+        results = self.cursor.fetchall()
+
+        self.tableWidget_1.setRowCount(len(results))
+
+        for i, result in enumerate(results):
+            
+            date_time, user_id, speed, penalty_type, penalty_score, score, image_path, image_name, json_data = result
+            date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
+            self.tableWidget_1.setItem(i, 0, QTableWidgetItem(date_time_str))
+            self.tableWidget_1.setItem(i, 1, QTableWidgetItem(self.car_number))
+            self.tableWidget_1.setItem(i, 2, QTableWidgetItem(str(score)))
+            self.tableWidget_1.setItem(i, 3, QTableWidgetItem(penalty_type))
+            self.tableWidget_1.setItem(i, 4, QTableWidgetItem(str(penalty_score)))
+            self.tableWidget_1.setItem(i, 5, QTableWidgetItem(str(speed)))
+            self.tableWidget_1.setItem(i, 6, QTableWidgetItem(image_path))
+            self.tableWidget_1.setItem(i, 7, QTableWidgetItem(image_name))
+            self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
+
     def load_admin_db(self):
-        pass
+        query = f"select ol.time, ud.car_number, od.objects, ol.image_path, ol.image_name, ol.json_data\
+                    from ObjectLog ol, ObjectData od, UserData ud \
+                    where (ol.user_id = ud.id) and (ol.object_id = od.id);"
+        self.cursor.execute(query)
+        results = self.cursor.fetchall()
+
+        self.tableWidget_2.setRowCount(len(results))
+
+        for i, result in enumerate(results):
+            date_time, car_number, _object, image_path, image_name, json_data = result
+            date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
+            self.tableWidget_2.setItem(i, 0, QTableWidgetItem(date_time_str))
+            self.tableWidget_2.setItem(i, 1, QTableWidgetItem(car_number))
+            self.tableWidget_2.setItem(i, 2, QTableWidgetItem(_object))
+            self.tableWidget_2.setItem(i, 3, QTableWidgetItem(image_path))
+            self.tableWidget_2.setItem(i, 4, QTableWidgetItem(image_name))
+            self.tableWidget_2.setItem(i, 5, QTableWidgetItem(json_data))
+    
+    def table1_dclicked(self, row, col):
+        image_path = self.tableWidget_1.item(row, 6).text()
+        image_name = self.tableWidget_1.item(row, 7).text()
+        json_data = json.loads(self.tableWidget_1.item(row, 8).text())
+
+        # 이미지에 박스 그리고 보여주기
+        image = cv2.imread(image_path+image_name)
+        for data in json_data:
+            cls = data['name']
+            conf = data['confidence']
+            x1, x2, y1, y2 = data['box'].values()
+            x1 = int(x1)
+            x2 = int(x2)
+            y1 = int(y1)
+            y2 = int(y2)
+
+            # 바운딩 박스 그리기
+            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
+
+            # 점수 텍스트 표시
+            label = f'{conf:.2f}'
+            cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 2)
+
+            # 클래스 표시
+            cv2.putText(image, cls, (x1 + 40, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
+        
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        h, w, c = image.shape
+        qimage = QImage(image, w, h, w * c, QImage.Format_RGB888)
+        self.pixmap_monitor_userlog = QPixmap.fromImage(qimage)
+        self.pixmap_monitor_userlog = self.pixmap_monitor_userlog.scaled(self.label_preview_1.width(), self.label_preview_1.height())
+        self.label_preview_1.setPixmap(self.pixmap_monitor_userlog)
+
+    def table2_dclicked(self, row, col):
+        image_path = self.tableWidget_2.item(row, 3).text()
+        image_name = self.tableWidget_2.item(row, 4).text()
+        json_data = json.loads(self.tableWidget_2.item(row, 5).text())
+
+        image = cv2.imread(image_path+image_name)
+        for data in json_data:
+            cls = data['name']
+            conf = data['confidence']
+            x1, x2, y1, y2 = data['box'].values()
+            x1 = int(x1)
+            x2 = int(x2)
+            y1 = int(y1)
+            y2 = int(y2)
+
+            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
+
+            label = f'{conf:.2f}'
+            cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 2)
+
+            cv2.putText(image, cls, (x1 + 40, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
+
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        h, w, c = image.shape
+        qimage = QImage(image, w, h, w * c, QImage.Format_RGB888)
+        self.pixmap_monitor_adminlog = QPixmap.fromImage(qimage)
+        self.pixmap_monitor_adminlog = self.pixmap_monitor_adminlog.scaled(self.label_preview_2.width(), self.label_preview_2.height())
+        self.label_preview_2.setPixmap(self.pixmap_monitor_adminlog)
 
     def end_session(self):
         self.close()

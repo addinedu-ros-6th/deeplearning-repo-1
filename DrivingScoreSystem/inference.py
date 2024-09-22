@@ -4,14 +4,17 @@ import cv2
 
 class Inference:
     def __init__(self):
-        self.model_lane = YOLO('/home/sh/dev_ws/track.pt')
-        self.model_sign = YOLO('/home/sh/dev_ws/track.pt')
+        self.model_lane = YOLO('../models/best_lane.pt')
+        self.model_sign = YOLO('../models/everything_2.pt')
 
 
-    # return = (frame, objects)
-    def predict(self, frame: np.ndarray) -> tuple[np.ndarray, list[dict[str: tuple[int, int, int, int]]], set[int]]:
+    def predict(self, frame: np.ndarray) -> tuple[np.ndarray, list[dict[str: tuple[int, int, int, int]]], set[int], list[list[dict]]]:
         results_lane = self.model_lane(frame, verbose=False)
         results_sign = self.model_sign(frame, verbose=False)
+
+        result_lane_json = results_lane[0].tojson()
+        result_sign_json = results_sign[0].tojson()
+        _json = [result_lane_json, result_sign_json]
 
         detects = []
         cls_list = []
@@ -77,7 +80,10 @@ class Inference:
                 detects.append({label: (x1, y1, x2, y2)})
                 cls_list.append(class_id+1)
         
+        # print("track_lane naems:", self.model_lane.names)
+        # print("track_sign naems:", self.model_sign.names)
+        
         cls_set = set(cls_list)
 
-        return (frame, detects, cls_set)
+        return (frame, detects, cls_set, _json)
     
