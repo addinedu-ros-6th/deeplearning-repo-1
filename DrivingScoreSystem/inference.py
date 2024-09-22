@@ -1,6 +1,7 @@
 from ultralytics import YOLO
 import numpy as np
 import cv2
+import json
 
 class Inference:
     def __init__(self):
@@ -14,6 +15,9 @@ class Inference:
 
         result_lane_json = results_lane[0].tojson()
         result_sign_json = results_sign[0].tojson()
+
+        result_lane_json = json.loads(result_lane_json)
+        result_sign_json = json.loads(result_sign_json)
         _json = [result_lane_json, result_sign_json]
 
         detects = []
