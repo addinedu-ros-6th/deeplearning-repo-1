@@ -85,6 +85,7 @@ class Judge:
         self.speed_limit_100_prev = 0
         self.green_signal_prev = 0
         self.limit_100_status_prev = 0
+        self.speed_violation_prev = 0
 
         # self.velocity = 30
 
@@ -96,15 +97,15 @@ class Judge:
         self.is_new_object = False
         self.new_object = set()
        
-        self.detected = [self.lane, self.dotted_lane, self.yellow_lane, self.stop_line, self.crosswalk, self.limit_30, self.limit_50, 
-                         self.limit_100, self.kidzone, self.section_start, self.section_end, self.oneway, 
-                         self.traffic_light_green, self.traffic_light_yellow, self.traffic_light_red, self.person]
+        self.detected = [self.lane, self.dotted_lane, self.limit_100, self.traffic_light_green,
+                         self.crosswalk, self.oneway, self.section_start, self.stop_line,
+                         self.traffic_light_red, self.kidzone, self.limit_30, self.person,
+                         self.traffic_light_yellow, self.yellow_lane, self.limit_50, self.section_end]
         
-        self.detected_classes = set()
-
-        
-    def verdict(self, detects: dict[str: tuple[int, int, int, int]], cls_set: set[int], velocity, frame) -> tuple[str, int]:
+    def verdict(self, detects: dict[str: tuple[int, int, int, int]], cls_set: set[int], velocity, frame, section_speed) -> tuple[str, int]:
         self.is_new_object = False
+
+        self.detected_classes = set()
 
         charge_id = 0
 
@@ -153,9 +154,6 @@ class Judge:
                 
                 self.objects_cnt_prev = self.objects_cnt
                 self.objects_list_prev = self.objects_list
-
-                # print(f"Detected class: {cls}")
-                # print(f"area : {area}")
 
                 if cls == "lane" and (len(self.lane) == 5) and (self.lane.count(True) >= detect_count):
                     self.lane_status = 1
@@ -216,15 +214,6 @@ class Judge:
                         self.person_status = 1
 
         if (self.kidzone_status == 1) or (self.redzone_status == 1):
-            # Create a mask to exclude white regions
-            # hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            # lower_white = np.array([0, 0, 200])  # Lower bound for white
-            # upper_white = np.array([180, 25, 255])  # Upper bound for white
-            # # white_mask = cv2.inRange(hsv_frame, lower_white, upper_white)
-
-            # Invert the mask to get non-white areas
-            # non_white_mask = cv2.bitwise_not(white_mask)
-
             # Step 2: Detect red lane markers only
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             lower_red1 = np.array([0, 100, 100])
@@ -241,9 +230,6 @@ class Judge:
             red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
             red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_CLOSE, kernel)
 
-            # Exclude white areas from red mask
-            # red_mask = cv2.bitwise_and(red_mask, non_white_mask)
-
             # Find and draw contours for lane markers
             contours, _ = cv2.findContours(red_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             for contour in contours:
@@ -258,7 +244,6 @@ class Judge:
                     self.redzone_status = 0
                     # self.kidzone_status = 0
 
-        # print("oneway:", self.oneway_status)
 
         # 횡단보도에 사람 있을 때 속도가 있으면 -15
         if self.crosswalk_status == 1 and self.person_status == 1 and velocity > 0 and self.human_on_crosswalk_violation_prev == 0:
@@ -279,12 +264,6 @@ class Judge:
             self.penalty += section_speed_violation
             print("section_speed_violation")   
 
-        # 100 표지판이 보였다가 안보였을 때 속도가 100 이상이면 -10
-        if self.limit_100_status == 0 and self.limit_100_status_prev == 1 and velocity > 100:
-            self.penalty += speed_violation   
-            self.speed_violation_prev = 0
-            charge_id = 3
-            print("speed_violation")
         
  # 3번 연속 감지되지 않았을 때 status를 0으로 바꾸는 로직
         status_mapping = {
@@ -331,7 +310,7 @@ class Judge:
         # 신호등 빨간 불일 때 정지선이 있었다가 없을때 속도가 0이면 -10
         if self.traffic_light_red_status == 1 and self.stop_line_status == 0 and self.stop_line_status_prev == 1 and velocity == 0 and self.stop_line_violation_prev == 0:
             self.penalty += stop_line_violation   
-            self.stop_line_violation_prev = 0
+            self.stop_line_violation_prev = 1
             charge_id = 5
             print("traffic_sign_red_violation")
 
@@ -343,5 +322,12 @@ class Judge:
             print("kidzone_speed_violation")
         else:
             self.kidzone_speed_violation_30_prev = 0
+
+        # 100 표지판이 보였다가 안보였을 때 속도가 100 이상이면 -10
+        if self.limit_100_status == 0 and self.limit_100_status_prev == 1 and velocity > 0 and self.speed_violation_prev == 0:
+            self.penalty += speed_violation   
+            self.speed_violation_prev = 1
+            charge_id = 3
+            print("speed_violation")
 
         return (charge_id, self.penalty, self.detected_classes, self.is_new_object, self.new_object)
