@@ -172,6 +172,9 @@
         <height>61</height>
        </rect>
       </property>
+      <property name="styleSheet">
+       <string notr="true">QLCDNumber{ color: rgb(0, 220, 0); }</string>
+      </property>
      </widget>
      <widget class="QLabel" name="label_speed">
       <property name="geometry">
@@ -239,6 +242,9 @@
      </property>
      <property name="editTriggers">
       <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::EditKeyPressed</set>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
      </property>
      <property name="columnCount">
       <number>9</number>
@@ -419,6 +425,15 @@
      <property name="editTriggers">
       <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::EditKeyPressed</set>
      </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>100</number>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>30</number>
+     </attribute>
      <column>
       <property name="text">
        <string>datetime</string>
