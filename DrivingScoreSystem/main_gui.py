@@ -132,9 +132,8 @@ class WindowClass(QMainWindow, from_class):
     # def on_tab_change(self, index):
     #     if index == 0:
 
-
     def socket_configuration(self, timeout=1):
-        self.host = '172.30.1.33'
+        self.host = '192.168.0.16'
         self.port = 9999
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -156,8 +155,8 @@ class WindowClass(QMainWindow, from_class):
         # print(f"Listening on {self.host}:{self.port}...")
     
     def socket_configuration_sectionSpeedReader(self, timeout=1):
-        self.host_2 = '172.30.1.76'
-        self.port_2 = 3333
+        self.host_2 = '192.168.0.27'
+        self.port_2 = 5555
 
         self.client_socket_2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -221,6 +220,9 @@ class WindowClass(QMainWindow, from_class):
             
             # 정수형으로 변환
             self.velocity = int(self.velocity)
+            self.velocity_static = 50
+            if self.velocity > 60:
+                self.velocity =self.velocity_static + self.velocity
             self.LCD_speed.display(self.velocity)
 
             if isinstance(frame, tuple) and isinstance(frame[0], np.ndarray):
@@ -265,8 +267,8 @@ class WindowClass(QMainWindow, from_class):
             self.label.setPixmap(self.pixmap_monitor)
 
             # 점수 차감
-            self.charge_id, self.penalty, detected_classes, self.is_new_object, self.new_object = self.judge.verdict(detects, cls_set, self.velocity, frame)
-            self.update_label(detected_classes)
+            self.charge_id, self.penalty, detected_classes, self.is_new_object, self.new_object = self.judge.verdict(detects, cls_set, self.velocity, frame, self.section_speed)
+            self.update_label(detected_classes) 
             
             if self.penalty:
                 self.palette.setColor(QPalette.WindowText, QColor(255, 0, 0))
@@ -290,7 +292,7 @@ class WindowClass(QMainWindow, from_class):
                     cv2.imwrite(self.path_admin+self.file_name, frame)
 
         except Exception as e:
-            print(f"Error in show_frame: {e}")
+            pass # print(f"Error in show_frame: {e}")
     
     def upload_penalty_data(self):
         insert = f"insert into PenaltyLog values ({self.now}, {self.user_id}, {self.charge_id}, {self.velocity})"
@@ -307,30 +309,30 @@ class WindowClass(QMainWindow, from_class):
         #         json_indi_new.append({key: dict[key] for key in ['name', 'class', 'confidence', 'box']})
         #     json_new.append(json_indi_new)
 
-        print("type(_json):", type(_json))
-        print("_json:", _json)
-        print()
+        # print("type(_json):", type(_json))
+        # print("_json:", _json)
+        # print()
 
         json_new = []
         for json_list in _json:
-            print("type(json_list):", type(json_list))
-            print("json_list:", json_list) 
-            print()
+            # print("type(json_list):", type(json_list))
+            # print("json_list:", json_list) 
+            # print()
             for _dict in json_list:
-                print("type(_dict):", type(_dict))
-                print("_dict:", _dict)
-                print()
+                # print("type(_dict):", type(_dict))
+                # print("_dict:", _dict)
+                # print()
                 json_new.append({key: _dict[key] for key in ['name', 'class', 'confidence', 'box']})
             
-        print("json_new:", json_new)
-        print()
+        # print("json_new:", json_new)
+        # print()
 
         # json_new = json.dumps(json_new)
 
         # insert = f"insert into ObjectLog values ('{self.now}', '{_object}', '{self.car_number}', '{self.path_admin}', '{json_new}', '{self.file_name}')"
         insert = f'''insert into ObjectLog values ('{self.now}', {self.user_id}, {object_id}, '{self.path_admin}', """{json_new}""", '{self.file_name}')'''
-        print("insert:", insert)
-        print()
+        # print("insert:", insert)
+        # print()
         self.cursor.execute(insert)
         self.conn.commit()
 
