@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QTableWidgetItem, QDialog
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QTableWidgetItem, QDialog, QApplication, QLabel, QVBoxLayout, QHeaderView
 from PyQt5.QtCore import QSocketNotifier
 from PyQt5.QtGui import *
 from PyQt5 import uic
@@ -12,6 +12,7 @@ import struct
 import pickle
 import datetime
 import json
+import sys
 
 from inference import Inference
 from judge import Judge
@@ -26,6 +27,12 @@ TODO
 - LCD 색 바뀌는거 작동 확인 하기
 - 
 '''
+
+app = QApplication(sys.argv)
+window = QMainWindow()
+with open("./Toolery.qss", 'r') as file:
+        qss = file.read()
+        app.setStyleSheet(qss)
 
 from_class = uic.loadUiType('./dl_gui.ui')[0]
 
@@ -74,10 +81,10 @@ class WindowClass(QMainWindow, from_class):
         self.model = Inference()
 
         # 첫번째 탭 열려있을 떄만 영상 받아오기
-        # self.Controll.currentChanged.connect(self.on_tab_change)
-        # if self.Controll.currentIndex() == 0:
-        #     self.socket_notifier.setEnabled(True)
-        #     self.socket_notifier_2.setEnabled(True)
+        self.Controll.currentChanged.connect(self.on_tab_change)
+        if self.Controll.currentIndex() == 0:
+            self.socket_notifier.setEnabled(True)
+            self.socket_notifier_2.setEnabled(True)
 
             # self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
             # self.socket_notifier.activated.connect(self.read_data)
@@ -108,13 +115,13 @@ class WindowClass(QMainWindow, from_class):
         self.tableWidget_2.setColumnHidden(4, True)
         self.tableWidget_2.setColumnHidden(5, True)
 
-        self.tableWidget_1.setColumnWidth(0, 130)
-        self.tableWidget_1.setColumnWidth(1, 80)
-        self.tableWidget_1.setColumnWidth(2, 40)
-        self.tableWidget_1.setColumnWidth(4, 20)
-        self.tableWidget_1.setColumnWidth(5, 20)
+        # self.tableWidget_1.setColumnWidth(0, 130)
+        # self.tableWidget_1.setColumnWidth(1, 80)
+        # self.tableWidget_1.setColumnWidth(2, 40)
+        # self.tableWidget_1.setColumnWidth(4, 20)
+        # self.tableWidget_1.setColumnWidth(5, 20)
 
-        self.tableWidget_2.setColumnWidth(0, 130)
+        # self.tableWidget_2.setColumnWidth(0, 130)
 
         # 점수 차감
         self.judge = Judge()
@@ -428,8 +435,6 @@ class WindowClass(QMainWindow, from_class):
                 return
         
         try:
-            print(f"Executing query: {base_query}")
-            print(f"With parameters: {params}")
             self.cursor.execute(base_query, params)
             results = self.cursor.fetchall()
 
@@ -438,6 +443,14 @@ class WindowClass(QMainWindow, from_class):
                 return
 
             self.tableWidget_1.setRowCount(len(results))
+
+            header = self.tableWidget_1.horizontalHeader()       
+            header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(5, QHeaderView.ResizeToContents)
 
             for i, result in enumerate(results):
                 date_time, speed, penalty_type, penalty_score, score, image_path, image_name, json_data = result
@@ -496,6 +509,11 @@ class WindowClass(QMainWindow, from_class):
             
             self.tableWidget_2.setRowCount(len(results))
 
+            header = self.tableWidget_2.horizontalHeader()       
+            header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+
             for i, result in enumerate(results):
                 date_time, car_number, _object, image_path, image_name, json_data = result
                 date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
@@ -511,14 +529,10 @@ class WindowClass(QMainWindow, from_class):
         
         except Exception as e:  # 예외 처리 추가
             QMessageBox.warning(self, "오류", f"데이터를 불러오는 중 오류가 발생했습니다: {str(e)}")
-    
-    def table1_dclicked(self, row, col):
-        image_path = self.tableWidget_1.item(row, 6).text()
-        image_name = self.tableWidget_1.item(row, 7).text()
-        json_data = json.loads(self.tableWidget_1.item(row, 8).text())
 
+    def open_new_window(self, image_path, image_name, json_data):
         # 이미지에 박스 그리고 보여주기
-        image = cv2.imread(image_path+image_name)
+        image = cv2.imread(image_path + image_name)
         for data in json_data:
             cls = data['name']
             conf = data['confidence']
@@ -532,40 +546,24 @@ class WindowClass(QMainWindow, from_class):
             label = f'{conf:.2f}'
             cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 2)
             cv2.putText(image, cls, (x1 + 40, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
-        
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        h, w, c = image.shape
-        qimage = QImage(image, w, h, w * c, QImage.Format_RGB888)
-        self.pixmap_monitor_userlog = QPixmap.fromImage(qimage)
-        self.pixmap_monitor_userlog = self.pixmap_monitor_userlog.scaled(self.label_preview_1.width(), self.label_preview_1.height())
-        self.label_preview_1.setPixmap(self.pixmap_monitor_userlog)
+
+        # 새로운 창을 생성하고 이미지를 보여줌
+        image_window = ImageWindow(image)
+        image_window.show_image()
+
+    def table1_dclicked(self, row, col):
+        image_path = self.tableWidget_1.item(row, 6).text()
+        image_name = self.tableWidget_1.item(row, 7).text()
+        json_data = json.loads(self.tableWidget_1.item(row, 8).text())
+
+        self.open_new_window(image_path, image_name, json_data)
 
     def table2_dclicked(self, row, col):
         image_path = self.tableWidget_2.item(row, 3).text()
         image_name = self.tableWidget_2.item(row, 4).text()
         json_data = json.loads(self.tableWidget_2.item(row, 5).text())
 
-        image = cv2.imread(image_path+image_name)
-        for data in json_data:
-            cls = data['name']
-            conf = data['confidence']
-            x1, x2, y1, y2 = data['box'].values()
-            x1 = int(x1)
-            x2 = int(x2)
-            y1 = int(y1)
-            y2 = int(y2)
-
-            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
-            label = f'{conf:.2f}'
-            cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 2)
-            cv2.putText(image, cls, (x1 + 40, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
-
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        h, w, c = image.shape
-        qimage = QImage(image, w, h, w * c, QImage.Format_RGB888)
-        self.pixmap_monitor_adminlog = QPixmap.fromImage(qimage)
-        self.pixmap_monitor_adminlog = self.pixmap_monitor_adminlog.scaled(self.label_preview_2.width(), self.label_preview_2.height())
-        self.label_preview_2.setPixmap(self.pixmap_monitor_adminlog)
+        self.open_new_window(image_path, image_name, json_data)
 
     def end_session(self):
         self.close()
@@ -575,3 +573,27 @@ class WindowClass(QMainWindow, from_class):
         login_dialog = login_gui.LoginDialog()
         if login_dialog.exec_() == QDialog.Accepted:
             self.show()
+
+
+class ImageWindow(QDialog):
+    def __init__(self, image, parent=None):
+        super(ImageWindow, self).__init__(parent)
+        self.setWindowTitle("Image Viewer")
+
+        # 이미지 QLabel 생성
+        label = QLabel(self)
+        height, width, channel = image.shape
+        bytes_per_line = 3 * width
+        q_image = QPixmap(QPixmap.fromImage(QImage(image.data, width, height, bytes_per_line, QImage.Format_RGB888).rgbSwapped()))
+
+        # QLabel에 이미지 설정
+        label.setPixmap(q_image)
+
+        # 레이아웃 설정
+        layout = QVBoxLayout()
+        layout.addWidget(label)
+        self.setLayout(layout)
+        self.resize(width, height)
+
+    def show_image(self):
+        self.exec_()
