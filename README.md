@@ -1,4 +1,4 @@
-# deeplearning-repo-1
+![image](https://github.com/user-attachments/assets/84d2d1a7-1c34-4589-9fe1-af7e1dfb11a0)# deeplearning-repo-1
 
 ## 1 프로젝트 소개
 
@@ -23,7 +23,7 @@ System Requirements
 ![image](https://github.com/user-attachments/assets/a0656b87-7abd-45bf-b08f-d8563af95463)
 
 ## 1.5 시스템 구성도
-![image](https://github.com/user-attachments/assets/c22ef6cd-cf62-4ee5-b65e-d28349a2571e)
+![image](https://github.com/user-attachments/assets/3f1c3042-8eff-41d2-87b2-f29da57473e4)
 
 ## 1.6 DATA BASE
 ![image](https://github.com/user-attachments/assets/8953e560-ecbf-4fd0-a911-a5c6c3ff4053)
