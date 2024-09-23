@@ -93,6 +93,8 @@ class Judge:
         self.traffic_sign_red_violation_prev = 0
         self.stop_line_violation_prev = 0
         self.human_on_crosswalk_violation_prev = 0
+        self.kidzone_speed_violation_30_prev = 0
+        self.section_speed_violation_prev = 0
 
         # 새로운 객체 감지
         self.objects_list = set()
@@ -206,7 +208,7 @@ class Judge:
 
                 elif cls == "traffic_light_green" and (len(self.traffic_light_green) == 5) and (self.traffic_light_green.count(True) >= detect_count):
                     self.traffic_light_green_status = 1  
-                    if self.detect_light_green_time_prev == 0:
+                    if self.detect_light_green_time_prev == 0 and velocity == 0:
                         self.detect_light_green_time = time.time()
                         self.detect_light_green_time_prev = 1
 
@@ -271,8 +273,9 @@ class Judge:
             print("traffic_sign_green_violation")
 
          # 구간 단속 50 이상이면 -10
-        if int(section_speed) > 50: 
+        if int(section_speed) > 50 and self.section_speed_violation_prev == 0: 
             self.penalty += section_speed_violation
+            self.section_speed_violation_prev  = 1
             charge_id = 2
             print("section_speed_violation")   
 

@@ -228,7 +228,7 @@ class WindowClass(QMainWindow, from_class):
             print(f"Socket error: {e}")
 
     def socket_configuration_sectionSpeedReader(self, timeout=1):
-        self.host_2 = '192.168.0.27'
+        self.host_2 = '192.168.0.129'
         self.port_2 = 5555
 
         self.client_socket_2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -293,8 +293,8 @@ class WindowClass(QMainWindow, from_class):
             
             # 정수형으로 변환
             self.velocity = int(self.velocity)
-            self.velocity_static = 50
-            if self.velocity > 60:
+            self.velocity_static = 30
+            if self.velocity > 80:
                 self.velocity =self.velocity_static + self.velocity
             self.LCD_speed.display(self.velocity)
 
@@ -368,7 +368,7 @@ class WindowClass(QMainWindow, from_class):
                 self.LCD_score.setStyleSheet('QLCDNumber{ color: rgb(255, 0, 0); }')
 
         except Exception as e:
-            print(f"Error in show_frame: {e}")
+            pass#print(f"Error in show_frame: {e}")
 
     def update_label(self, detected_classes):
         label_text = ",\n".join(detected_classes)

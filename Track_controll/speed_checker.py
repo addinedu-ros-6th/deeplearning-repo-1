@@ -2,7 +2,7 @@ import socket
 import serial
 import time
 
-SpeedChecker = serial.Serial(port='/dev/ttyACM0', baudrate= 9600, timeout= 1)
+SpeedChecker = serial.Serial(port='/dev/ttyACM1', baudrate= 9600, timeout= 1)
 
 def handle_client(client_socket, client_address):
     print(f"Connected to {client_address}") 
