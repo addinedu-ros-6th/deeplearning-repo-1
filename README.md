@@ -1,5 +1,3 @@
-![image](https://github.com/user-attachments/assets/84d2d1a7-1c34-4589-9fe1-af7e1dfb11a0)# deeplearning-repo-1
-
 ## 1 프로젝트 소개
 
 ##  1.1 개요
