@@ -74,10 +74,10 @@ class WindowClass(QMainWindow, from_class):
         self.model = Inference()
 
         # 첫번째 탭 열려있을 떄만 영상 받아오기
-        self.Controll.currentChanged.connect(self.on_tab_change)
-        if self.Controll.currentIndex() == 0:
-            self.socket_notifier.setEnabled(True)
-            self.socket_notifier_2.setEnabled(True)
+        # self.Controll.currentChanged.connect(self.on_tab_change)
+        # if self.Controll.currentIndex() == 0:
+        #     self.socket_notifier.setEnabled(True)
+        #     self.socket_notifier_2.setEnabled(True)
 
             # self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
             # self.socket_notifier.activated.connect(self.read_data)
@@ -227,8 +227,8 @@ class WindowClass(QMainWindow, from_class):
         # print(f"Listening on {self.host}:{self.port}...")
     
     def socket_configuration_sectionSpeedReader(self, timeout=1):
-        self.host_2 = '192.168.0.16'
-        self.port_2 = 3333
+        self.host_2 = '192.168.0.27'
+        self.port_2 = 5555
 
         self.client_socket_2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -348,7 +348,7 @@ class WindowClass(QMainWindow, from_class):
                 self.label_lastPenalty.setText("-" + str(self.penalty))
 
                 # 감점사항 있을 시 DB 업로드
-                self.upload_penalty_data()
+                self.upload_penalty_data(_json)
                 cv2.imwrite(self.path_user+self.file_name, frame)
             
             # 새로운 객체 감지 시 DB 업로드
@@ -362,7 +362,7 @@ class WindowClass(QMainWindow, from_class):
                 self.LCD_score.setStyleSheet('QLCDNumber{ color: rgb(220, 220, 0); }')
             elif (self.score >= 20) and (self.score < 60):
                 self.LCD_score.setStyleSheet('QLCDNumber{ color: rgb(220, 135, 0); }')
-            else:
+            elif self.score >= 60:
                 self.LCD_score.setStyleSheet('QLCDNumber{ color: rgb(255, 0, 0); }')
 
         except Exception as e:
@@ -437,7 +437,7 @@ class WindowClass(QMainWindow, from_class):
             print(f"With parameters: {params}")
             self.cursor.execute(base_query, params)
             results = self.cursor.fetchall()
-            
+
             if len(results) == 0:
                 QMessageBox.warning(self, "검색 결과", "선택한 조건에 맞는 데이터가 없습니다.")
                 return
