@@ -259,8 +259,9 @@ class Judge:
             print("traffic_sign_green_violation")
 
          # 구간 단속 50 이상이면 -10
-        if int(section_speed) > 30: 
+        if int(section_speed) > 50: 
             self.penalty += section_speed_violation
+            charge_id = 2
             print("section_speed_violation")   
 
         
