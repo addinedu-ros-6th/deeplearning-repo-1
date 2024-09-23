@@ -60,18 +60,18 @@ class WindowClass(QMainWindow, from_class):
             print("Logged in as regular user")
 
         # 소켓 설정
-        self.socket_configuration()
-        self.socket_configuration_sectionSpeedReader()
+        # self.socket_configuration()
+        # self.socket_configuration_sectionSpeedReader()
 
-        self.data = b""
-        self.payload_size = struct.calcsize("Q")
+        # self.data = b""
+        # self.payload_size = struct.calcsize("Q")
 
-        # QSocketNotifier 설정 (읽기 가능할 때 알림 받음)
-        self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
-        self.socket_notifier.activated.connect(self.read_data)
+        # # QSocketNotifier 설정 (읽기 가능할 때 알림 받음)
+        # self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
+        # self.socket_notifier.activated.connect(self.read_data)
 
-        self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
-        self.socket_notifier_2.activated.connect(self.read_data_2)
+        # self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
+        # self.socket_notifier_2.activated.connect(self.read_data_2)
         
         # DB 설정
         self.db_configuration()
@@ -91,10 +91,10 @@ class WindowClass(QMainWindow, from_class):
         self.tableWidget_2.cellDoubleClicked.connect(self.table2_dclicked)
 
         # 시간 설정
-        self.dateTime_start_1.setDateTime(QDateTime.currentDateTime())
+        # self.dateTime_start_1.setDateTime(QDateTime.currentDateTime())
         self.dateTime_end_1.setDateTime(QDateTime.currentDateTime())
-        self.dateTime_start_2.setDateTime(QDateTime.currentDateTime())
-        self.dateTime_end_2.setDateTime(QDateTime.currentDateTime())
+        # self.dateTime_start_2.setDateTime(QDateTime.currentDateTime())
+        self.dateTime_end_2.setDateTime(QDateTime.currentDateTime())  
 
         # 표 설정
         self.tableWidget_1.setColumnHidden(6, True)
@@ -134,7 +134,7 @@ class WindowClass(QMainWindow, from_class):
 
 
     def socket_configuration(self, timeout=1):
-        self.host = '172.30.1.33'
+        self.host = '192.168.0.16'
         self.port = 9999
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -156,7 +156,7 @@ class WindowClass(QMainWindow, from_class):
         # print(f"Listening on {self.host}:{self.port}...")
     
     def socket_configuration_sectionSpeedReader(self, timeout=1):
-        self.host_2 = '172.30.1.76'
+        self.host_2 = '192.168.0.16'
         self.port_2 = 3333
 
         self.client_socket_2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -191,7 +191,7 @@ class WindowClass(QMainWindow, from_class):
             print("Connected to DB")
             
         except mysql.connector.Error as err:
-            QMessageBox.critical(self, "Error", f"Error: {err}")
+            QMessageBox.warning(self, "Error", f"Error: {err}")
 
     def read_data(self):
         try:
@@ -339,49 +339,125 @@ class WindowClass(QMainWindow, from_class):
         label_text = ",\n".join(detected_classes)
         self.label_status_desc.setText(label_text)
     
+
     def load_user_db(self):
-        query = f"select pl.time, pl.user_id, pl.speed, pd.penalty_type, pd.penalty_score, \
-                    pl.score, pl.image_path, pl.image_name, pl.json_data \
-                    from PenaltyLog pl, PenaltyData pd \
-                    where (pl.user_id = {self.user_id}) and (pl.penalty_id = pd.id);"
-        self.cursor.execute(query)
-        results = self.cursor.fetchall()
-
-        self.tableWidget_1.setRowCount(len(results))
-
-        for i, result in enumerate(results):
+        start_date1 = self.dateTime_start_1.dateTime().toString("yyyy-MM-dd HH:mm:ss")
+        end_date1 = self.dateTime_end_1.dateTime().toString("yyyy-MM-dd HH:mm:ss")
+        search_option = self.comboBox_1.currentText()
+        search_text = self.lineEdit.text()
+        base_query = """
+            SELECT pl.time, pl.speed, pd.penalty_type, pd.penalty_score,
+                pl.score, pl.image_path, pl.image_name, pl.json_data
+            FROM PenaltyLog pl
+            JOIN PenaltyData pd ON pl.penalty_id = pd.id
+            WHERE pl.user_id = %s AND pl.time BETWEEN %s AND %s
+            """
+        params = [self.user_id, start_date1, end_date1]
+        
+        if search_text:
+            if search_option == 'All':
+                base_query += """
+                AND (pd.penalty_type LIKE %s OR pd.penalty_score LIKE %s OR pl.speed LIKE %s)
+                """
+                params.extend([f"%{search_text}%"] * 3)
+            elif search_option == 'penalty_type':
+                base_query += "AND pd.penalty_type LIKE %s"
+                params.append(f"%{search_text}%")
+            elif search_option == 'pd.penalty_score':
+                base_query += "AND pd.penalty_score LIKE %s"
+                params.append(f"%{search_text}%")
+            elif search_option == 'speed':
+                base_query += "AND pl.speed LIKE %s"
+                params.append(f"%{search_text}%")
+            else:
+                QMessageBox.warning(self, "경고", "올바르지 않은 검색 옵션입니다.")
+                return
+        
+        try:
+            print(f"Executing query: {base_query}")
+            print(f"With parameters: {params}")
+            self.cursor.execute(base_query, params)
+            results = self.cursor.fetchall()
             
-            date_time, user_id, speed, penalty_type, penalty_score, score, image_path, image_name, json_data = result
-            date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
-            self.tableWidget_1.setItem(i, 0, QTableWidgetItem(date_time_str))
-            self.tableWidget_1.setItem(i, 1, QTableWidgetItem(self.car_number))
-            self.tableWidget_1.setItem(i, 2, QTableWidgetItem(str(score)))
-            self.tableWidget_1.setItem(i, 3, QTableWidgetItem(penalty_type))
-            self.tableWidget_1.setItem(i, 4, QTableWidgetItem(str(penalty_score)))
-            self.tableWidget_1.setItem(i, 5, QTableWidgetItem(str(speed)))
-            self.tableWidget_1.setItem(i, 6, QTableWidgetItem(image_path))
-            self.tableWidget_1.setItem(i, 7, QTableWidgetItem(image_name))
-            self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
+            if len(results) == 0:
+                QMessageBox.warning(self, "검색 결과", "선택한 조건에 맞는 데이터가 없습니다.")
+                return
 
-    def load_admin_db(self):
-        query = f"select ol.time, ud.car_number, od.objects, ol.image_path, ol.image_name, ol.json_data\
-                    from ObjectLog ol, ObjectData od, UserData ud \
-                    where (ol.user_id = ud.id) and (ol.object_id = od.id);"
-        self.cursor.execute(query)
-        results = self.cursor.fetchall()
+            self.tableWidget_1.setRowCount(len(results))
 
-        self.tableWidget_2.setRowCount(len(results))
-
-        for i, result in enumerate(results):
-            date_time, car_number, _object, image_path, image_name, json_data = result
-            date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
-            self.tableWidget_2.setItem(i, 0, QTableWidgetItem(date_time_str))
-            self.tableWidget_2.setItem(i, 1, QTableWidgetItem(car_number))
-            self.tableWidget_2.setItem(i, 2, QTableWidgetItem(_object))
-            self.tableWidget_2.setItem(i, 3, QTableWidgetItem(image_path))
-            self.tableWidget_2.setItem(i, 4, QTableWidgetItem(image_name))
-            self.tableWidget_2.setItem(i, 5, QTableWidgetItem(json_data))
+            for i, result in enumerate(results):
+                date_time, speed, penalty_type, penalty_score, score, image_path, image_name, json_data = result
+                date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
+                self.tableWidget_1.setItem(i, 0, QTableWidgetItem(date_time_str))
+                self.tableWidget_1.setItem(i, 1, QTableWidgetItem(self.car_number))
+                self.tableWidget_1.setItem(i, 2, QTableWidgetItem(str(score)))
+                self.tableWidget_1.setItem(i, 3, QTableWidgetItem(penalty_type))
+                self.tableWidget_1.setItem(i, 4, QTableWidgetItem(str(penalty_score)))
+                self.tableWidget_1.setItem(i, 5, QTableWidgetItem(str(speed)))
+                self.tableWidget_1.setItem(i, 6, QTableWidgetItem(image_path))
+                self.tableWidget_1.setItem(i, 7, QTableWidgetItem(image_name))
+                self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
+        
+        except Exception as e:
+            print(f"Error details: {str(e)}")
+            QMessageBox.warning(self, "오류", f"데이터를 불러오는 중 오류가 발생했습니다: {str(e)}")
     
+    def load_admin_db(self):
+        start_date2 = self.dateTime_start_2.dateTime().toString("yyyy-MM-dd HH:mm:ss")
+        end_date2 = self.dateTime_end_2.dateTime().toString("yyyy-MM-dd HH:mm:ss")
+        
+        search_option = self.comboBox_2.currentText()
+        search_text = self.lineEdit_2.text()
+        
+        base_query = """
+        SELECT ol.time, ud.car_number, od.objects, ol.image_path, ol.image_name, ol.json_data
+        FROM ObjectLog ol, ObjectData od, UserData ud 
+        WHERE (ol.user_id = ud.id) AND (ol.object_id = od.id) 
+        AND (ol.time BETWEEN %s AND %s)
+        """
+        
+        if search_text:  # 수정된 부분
+            if search_option == 'All':
+                additional_condition = """
+                AND (ud.car_number LIKE %s OR od.objects LIKE %s OR ol.time LIKE %s)
+                """
+                search_params = (f"%{search_text}%", f"%{search_text}%", f"%{search_text}%")
+            elif search_option == 'plate':
+                additional_condition = "AND ud.car_number LIKE %s"
+                search_params = (f"%{search_text}%",)
+            elif search_option == 'object':
+                additional_condition = "AND od.objects LIKE %s"
+                search_params = (f"%{search_text}%",)
+            
+            query = base_query + additional_condition
+            params = (start_date2, end_date2) + search_params
+        else:
+            query = base_query
+            params = (start_date2, end_date2)
+
+        try:  # 예외 처리 추가
+            self.cursor.execute(query, params)
+            results = self.cursor.fetchall()
+            
+            self.tableWidget_2.setRowCount(len(results))
+
+            for i, result in enumerate(results):
+                date_time, car_number, _object, image_path, image_name, json_data = result
+                date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
+                self.tableWidget_2.setItem(i, 0, QTableWidgetItem(date_time_str))
+                self.tableWidget_2.setItem(i, 1, QTableWidgetItem(car_number))
+                self.tableWidget_2.setItem(i, 2, QTableWidgetItem(_object))
+                self.tableWidget_2.setItem(i, 3, QTableWidgetItem(image_path))
+                self.tableWidget_2.setItem(i, 4, QTableWidgetItem(image_name))
+                self.tableWidget_2.setItem(i, 5, QTableWidgetItem(json_data))
+            
+            if len(results) == 0:
+                QMessageBox.warning(self, "검색 결과", "선택한 조건에 맞는 데이터가 없습니다.")
+        
+        except Exception as e:  # 예외 처리 추가
+            QMessageBox.warning(self, "오류", f"데이터를 불러오는 중 오류가 발생했습니다: {str(e)}")
+    
+        
     def table1_dclicked(self, row, col):
         image_path = self.tableWidget_1.item(row, 6).text()
         image_name = self.tableWidget_1.item(row, 7).text()

@@ -29,7 +29,7 @@
     <enum>QTabWidget::North</enum>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="Main">
     <property name="font">
@@ -366,12 +366,12 @@
      </item>
      <item>
       <property name="text">
-       <string>minus reason</string>
+       <string>penalty type</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>penalty</string>
+       <string>penalty score</string>
       </property>
      </item>
      <item>
@@ -502,6 +502,9 @@
        <width>161</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="calendarPopup">
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineEdit_2">
