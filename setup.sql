@@ -26,7 +26,7 @@ CREATE TABLE PenaltyLog
     user_id int, 
     penalty_id int, 
     speed int, 
-    image_name varchar(16), 
+    image_name varchar(36), 
     image_path = varchar(40), 
     json_data json, 
     score int, 
@@ -41,7 +41,7 @@ CREATE TABLE ObjectLog
     object_id int, 
     image_path varchar(40), 
     json_data json, 
-    image_name varchar(16), 
+    image_name varchar(36), 
     FOREIGN KEY (user_id) REFERENCES UserData(id), 
     FOREIGN KEY (object_id) REFERENCES ObjectData(id)
 }
