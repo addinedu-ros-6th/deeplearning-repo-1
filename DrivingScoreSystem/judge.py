@@ -1,5 +1,4 @@
 from collections import deque
-from ultralytics import YOLO
 import numpy as np
 import cv2
 
@@ -103,6 +102,8 @@ class Judge:
                          self.traffic_light_yellow, self.yellow_lane, self.limit_50, self.section_end]
         
     def verdict(self, detects: dict[str: tuple[int, int, int, int]], cls_set: set[int], velocity, frame, section_speed) -> tuple[str, int]:
+        self.objects_list = set()
+        self.objects_cnt = len(self.objects_list)
         self.is_new_object = False
 
         self.detected_classes = set()
@@ -151,9 +152,7 @@ class Judge:
                     print("new object detected!!!")
                     self.is_new_object = True
                     self.new_object = self.objects_list - self.objects_list_prev
-                
-                self.objects_cnt_prev = self.objects_cnt
-                self.objects_list_prev = self.objects_list
+            
 
                 if cls == "lane" and (len(self.lane) == 5) and (self.lane.count(True) >= detect_count):
                     self.lane_status = 1
@@ -265,7 +264,7 @@ class Judge:
             print("section_speed_violation")   
 
         
- # 3번 연속 감지되지 않았을 때 status를 0으로 바꾸는 로직
+        # 3번 연속 감지되지 않았을 때 status를 0으로 바꾸는 로직
         status_mapping = {
             'lane': ('lane_status', 'lane_miss_count'),
             'dotted_lane': ('dotted_lane_status', 'dotted_lane_miss_count'),
@@ -329,5 +328,8 @@ class Judge:
             self.speed_violation_prev = 1
             charge_id = 3
             print("speed_violation")
+
+        self.objects_cnt_prev = self.objects_cnt
+        self.objects_list_prev = self.objects_list
 
         return (charge_id, self.penalty, self.detected_classes, self.is_new_object, self.new_object)
