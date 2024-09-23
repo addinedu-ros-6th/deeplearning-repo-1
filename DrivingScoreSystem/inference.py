@@ -5,8 +5,8 @@ import json
 
 class Inference:
     def __init__(self):
-        self.model_lane = YOLO('../models/track_lane.pt')
-        self.model_sign = YOLO('../models/track_sign.pt')
+        self.model_lane = YOLO('../../models/track_lane.pt')
+        self.model_sign = YOLO('../../models/track_sign.pt')
 
 
     def predict(self, frame: np.ndarray) -> tuple[np.ndarray, list[dict[str: tuple[int, int, int, int]]], set[int], list[list[dict]]]:
