@@ -53,7 +53,7 @@ class WindowClass(QMainWindow, from_class):
             self.hide_admin_tab()
             print("Logged in as regular user")
 
-        # 소켓 설정
+        # # 소켓 설정
         # self.socket_configuration()
         # self.socket_configuration_sectionSpeedReader()
 
@@ -94,9 +94,9 @@ class WindowClass(QMainWindow, from_class):
         self.tableWidget_2.cellDoubleClicked.connect(self.table2_dclicked)
 
         # 시간 설정
-        # self.dateTime_start_1.setDateTime(QDateTime.currentDateTime())
+        self.dateTime_start_1.setDateTime(QDateTime.currentDateTime().addMonths(-1))
         self.dateTime_end_1.setDateTime(QDateTime.currentDateTime())
-        # self.dateTime_start_2.setDateTime(QDateTime.currentDateTime())
+        self.dateTime_start_2.setDateTime(QDateTime.currentDateTime().addMonths(-1))
         self.dateTime_end_2.setDateTime(QDateTime.currentDateTime())  
 
         # 표 설정
