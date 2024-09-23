@@ -20,12 +20,8 @@ import login_gui
 
 '''
 TODO
-- log 기록용 json형식 반환하기
-    - json 뭐 들어갈지 정하기
 - 어보 빨간색 도로 처리하기
 - 로그 검색기능 완성하기
-- sql 파일 만들기
-    - sql 테이블 생성하는 코드 작성하기. 
 - 활성화 되어있는 탭만 작동하게 하기
 - LCD 색 바뀌는거 작동 확인 하기
 - 
@@ -78,7 +74,16 @@ class WindowClass(QMainWindow, from_class):
         self.model = Inference()
 
         # 첫번째 탭 열려있을 떄만 영상 받아오기
-        # self.Controll.currentChanged.connect(self.on_tab_change)
+        self.Controll.currentChanged.connect(self.on_tab_change)
+        if self.Controll.currentIndex() == 0:
+            self.socket_notifier.setEnabled(True)
+            self.socket_notifier_2.setEnabled(True)
+
+            # self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
+            # self.socket_notifier.activated.connect(self.read_data)
+
+            # self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
+            # self.socket_notifier_2.activated.connect(self.read_data_2)
 
         # 버튼
         self.btn_logout.clicked.connect(self.end_session)
@@ -103,9 +108,17 @@ class WindowClass(QMainWindow, from_class):
         self.tableWidget_2.setColumnHidden(4, True)
         self.tableWidget_2.setColumnHidden(5, True)
 
+        self.tableWidget_1.setColumnWidth(0, 130)
+        self.tableWidget_1.setColumnWidth(1, 80)
+        self.tableWidget_1.setColumnWidth(2, 40)
+        self.tableWidget_1.setColumnWidth(4, 20)
+        self.tableWidget_1.setColumnWidth(5, 20)
+
+        self.tableWidget_2.setColumnWidth(0, 130)
+
         # 점수 lcd 설정
-        self.palette = self.LCD_score.palette()
-        self.palette.setColor(QPalette.WindowText, QColor(0, 255, 0))
+        # self.palette = self.LCD_score.palette()
+        # self.palette.setColor(QPalette.WindowText, QColor(0, 255, 0))
 
         # 점수 차감
         self.judge = Judge()
@@ -131,12 +144,65 @@ class WindowClass(QMainWindow, from_class):
     
     def on_tab_change(self, index):
         if index == 0:
-            # QSocketNotifier 설정 (읽기 가능할 때 알림 받음)
-            self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
-            self.socket_notifier.activated.connect(self.read_data)
+            print("index: 0")
+            self.socket_notifier.setEnabled(True)
+            self.socket_notifier_2.setEnabled(True)
+            # self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
+            # self.socket_notifier.activated.connect(self.read_data)
 
-            self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
-            self.socket_notifier_2.activated.connect(self.read_data_2)
+            # self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
+            # self.socket_notifier_2.activated.connect(self.read_data_2)
+        
+        if index == 1:
+            print("index: 1")
+            self.socket_notifier.setEnabled(False)
+            self.socket_notifier_2.setEnabled(False)
+
+            query = f"select pl.time, pl.speed, pd.penalty_type, pd.penalty_score, \
+                        pl.score, pl.image_path, pl.image_name, pl.json_data \
+                        from PenaltyLog pl, PenaltyData pd \
+                        where (pl.user_id = {self.user_id}) and (pl.penalty_id = pd.id);"
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
+
+            self.tableWidget_1.setRowCount(len(results))
+
+            for i, result in enumerate(results):
+                
+                date_time, speed, penalty_type, penalty_score, score, image_path, image_name, json_data = result
+                date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
+                self.tableWidget_1.setItem(i, 0, QTableWidgetItem(date_time_str))
+                self.tableWidget_1.setItem(i, 1, QTableWidgetItem(self.car_number))
+                self.tableWidget_1.setItem(i, 2, QTableWidgetItem(str(score)))
+                self.tableWidget_1.setItem(i, 3, QTableWidgetItem(penalty_type))
+                self.tableWidget_1.setItem(i, 4, QTableWidgetItem(str(penalty_score)))
+                self.tableWidget_1.setItem(i, 5, QTableWidgetItem(str(speed)))
+                self.tableWidget_1.setItem(i, 6, QTableWidgetItem(image_path))
+                self.tableWidget_1.setItem(i, 7, QTableWidgetItem(image_name))
+                self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
+        
+        if index == 2:
+            print("index 2")
+            self.socket_notifier.setEnabled(False)
+            self.socket_notifier_2.setEnabled(False)
+
+            query = f"select ol.time, ud.car_number, od.objects, ol.image_path, ol.image_name, ol.json_data \
+                        from ObjectLog ol, ObjectData od, UserData ud \
+                        where (ol.user_id = ud.id) and (ol.object_id = od.id);"
+            self.cursor.execute(query)
+            results = self.cursor.fetchall()
+
+            self.tableWidget_2.setRowCount(len(results))
+
+            for i, result in enumerate(results):
+                date_time, car_number, _object, image_path, image_name, json_data = result
+                date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
+                self.tableWidget_2.setItem(i, 0, QTableWidgetItem(date_time_str))
+                self.tableWidget_2.setItem(i, 1, QTableWidgetItem(car_number))
+                self.tableWidget_2.setItem(i, 2, QTableWidgetItem(_object))
+                self.tableWidget_2.setItem(i, 3, QTableWidgetItem(image_path))
+                self.tableWidget_2.setItem(i, 4, QTableWidgetItem(image_name))
+                self.tableWidget_2.setItem(i, 5, QTableWidgetItem(json_data))
 
     def socket_configuration(self, timeout=1):
         self.host = '192.168.0.16'
@@ -274,7 +340,8 @@ class WindowClass(QMainWindow, from_class):
             self.update_label(detected_classes)
             
             if self.penalty:
-                self.palette.setColor(QPalette.WindowText, QColor(255, 0, 0))
+                # self.palette.setColor(QPalette.WindowText, QColor(255, 0, 0))
+
                 self.score += self.penalty
                 print(self.score, self.penalty)
                 self.LCD_score.display(self.score)
@@ -290,12 +357,18 @@ class WindowClass(QMainWindow, from_class):
                     object_id = self.object_data[e]
                     self.upload_new_object_data(object_id, _json)
                     cv2.imwrite(self.path_admin+self.file_name, frame)
+            
+            if (self.score > 0) and (self.score < 20):
+                self.LCD_score.setStyleSheet('QLCDNumber{ color: rgb(220, 220, 0); }')
+            elif (self.score >= 20) and (self.score < 60):
+                self.LCD_score.setStyleSheet('QLCDNumber{ color: rgb(220, 135, 0); }')
+            else:
+                self.LCD_score.setStyleSheet('QLCDNumber{ color: rgb(255, 0, 0); }')
 
         except Exception as e:
             print(f"Error in show_frame: {e}")
 
     def update_label(self, detected_classes):
-        # set 데이터를 문자열로 변환하여 표시 (콤마로 구분)
         label_text = ",\n".join(detected_classes)
         self.label_status_desc.setText(label_text)
     
@@ -346,7 +419,7 @@ class WindowClass(QMainWindow, from_class):
             self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
 
     def load_admin_db(self):
-        query = f"select ol.time, ud.car_number, od.objects, ol.image_path, ol.image_name, ol.json_data\
+        query = f"select ol.time, ud.car_number, od.objects, ol.image_path, ol.image_name, ol.json_data \
                     from ObjectLog ol, ObjectData od, UserData ud \
                     where (ol.user_id = ud.id) and (ol.object_id = od.id);"
         self.cursor.execute(query)
@@ -368,7 +441,6 @@ class WindowClass(QMainWindow, from_class):
         image_path = self.tableWidget_1.item(row, 6).text()
         image_name = self.tableWidget_1.item(row, 7).text()
         json_data = json.loads(self.tableWidget_1.item(row, 8).text())
-        print("json_data:", json_data)
 
         # 이미지에 박스 그리고 보여주기
         image = cv2.imread(image_path+image_name)
@@ -428,5 +500,3 @@ class WindowClass(QMainWindow, from_class):
         login_dialog = login_gui.LoginDialog()
         if login_dialog.exec_() == QDialog.Accepted:
             self.show()
-
-
