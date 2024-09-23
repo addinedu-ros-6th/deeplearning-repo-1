@@ -11,7 +11,7 @@ class Inference:
 
     def predict(self, frame: np.ndarray) -> tuple[np.ndarray, list[dict[str: tuple[int, int, int, int]]], set[int], list[list[dict]]]:
         results_lane = self.model_lane(frame, verbose=False)
-        results_sign = self.model_sign(frame, verbose=False)
+        results_sign = self.model_sign(frame, verbose=False,conf = 0.4)
 
         result_lane_json = results_lane[0].tojson()
         result_sign_json = results_sign[0].tojson()

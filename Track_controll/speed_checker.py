@@ -17,8 +17,6 @@ def handle_client(client_socket, client_address):
             if section_speed:  # section_speed가 비어있지 않으면 전송
                 client_socket.sendall(section_speed.encode('utf-8'))
 
-            time.sleep(0.1)
-
     except (BrokenPipeError, ConnectionResetError):
         print(f"Client {client_address} disconnected")
     finally:
@@ -28,7 +26,7 @@ def main():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-    server_socket.bind(('0.0.0.0', 3333)) 
+    server_socket.bind(('0.0.0.0', 5555)) 
     server_socket.listen(5) 
     print("Server started. Waiting for connections...")
 

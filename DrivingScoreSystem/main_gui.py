@@ -53,19 +53,19 @@ class WindowClass(QMainWindow, from_class):
             self.hide_admin_tab()
             print("Logged in as regular user")
 
-        # # 소켓 설정
-        # self.socket_configuration()
-        # self.socket_configuration_sectionSpeedReader()
+        # 소켓 설정
+        self.socket_configuration()
+        self.socket_configuration_sectionSpeedReader()
 
-        # self.data = b""
-        # self.payload_size = struct.calcsize("Q")
+        self.data = b""
+        self.payload_size = struct.calcsize("Q")
 
-        # # QSocketNotifier 설정 (읽기 가능할 때 알림 받음)
-        # self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
-        # self.socket_notifier.activated.connect(self.read_data)
+        # QSocketNotifier 설정 (읽기 가능할 때 알림 받음)
+        self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
+        self.socket_notifier.activated.connect(self.read_data)
 
-        # self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
-        # self.socket_notifier_2.activated.connect(self.read_data_2)
+        self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
+        self.socket_notifier_2.activated.connect(self.read_data_2)
         
         # DB 설정
         self.db_configuration()
@@ -115,10 +115,6 @@ class WindowClass(QMainWindow, from_class):
         self.tableWidget_1.setColumnWidth(5, 20)
 
         self.tableWidget_2.setColumnWidth(0, 130)
-
-        # 점수 lcd 설정
-        # self.palette = self.LCD_score.palette()
-        # self.palette.setColor(QPalette.WindowText, QColor(0, 255, 0))
 
         # 점수 차감
         self.judge = Judge()
@@ -224,8 +220,6 @@ class WindowClass(QMainWindow, from_class):
         except socket.error as e:
             print(f"Socket error: {e}")
 
-        # print(f"Listening on {self.host}:{self.port}...")
-    
     def socket_configuration_sectionSpeedReader(self, timeout=1):
         self.host_2 = '192.168.0.27'
         self.port_2 = 5555
@@ -292,6 +286,9 @@ class WindowClass(QMainWindow, from_class):
             
             # 정수형으로 변환
             self.velocity = int(self.velocity)
+            self.velocity_static = 50
+            if self.velocity > 60:
+                self.velocity =self.velocity_static + self.velocity
             self.LCD_speed.display(self.velocity)
 
             if isinstance(frame, tuple) and isinstance(frame[0], np.ndarray):
@@ -337,11 +334,9 @@ class WindowClass(QMainWindow, from_class):
 
             # 점수 차감
             self.charge_id, self.penalty, detected_classes, self.is_new_object, self.new_object = self.judge.verdict(detects, cls_set, self.velocity, frame, self.section_speed)
-            self.update_label(detected_classes)
+            self.update_label(detected_classes) 
             
             if self.penalty:
-                # self.palette.setColor(QPalette.WindowText, QColor(255, 0, 0))
-
                 self.score += self.penalty
                 print(self.score, self.penalty)
                 self.LCD_score.display(self.score)
@@ -388,9 +383,9 @@ class WindowClass(QMainWindow, from_class):
         for json_list in _json:
             for _dict in json_list:
                 json_new.append({key: _dict[key] for key in ['name', 'class', 'confidence', 'box']})
-        
         json_new = json.dumps(json_new)
-        insert = f'''insert into ObjectLog values ('{self.now}', {self.user_id}, {object_id}, '{self.path_admin}', '{json_new}', '{self.file_name}')'''
+        insert = f'''insert into ObjectLog values ('{self.now}', {self.user_id}, {object_id}, '{self.path_admin}', """{json_new}""", '{self.file_name}')'''
+
         self.cursor.execute(insert)
         self.conn.commit()
 
