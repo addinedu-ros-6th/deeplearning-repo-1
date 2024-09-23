@@ -94,8 +94,6 @@ class Judge:
         self.stop_line_violation_prev = 0
         self.human_on_crosswalk_violation_prev = 0
 
-        # self.velocity = 30
-
         # 새로운 객체 감지
         self.objects_list = set()
         self.objects_list_prev = set()
@@ -257,10 +255,6 @@ class Judge:
                     print("No", "kidzone_status:", self.kidzone_status, "redzone_status:", self.redzone_status)
                     continue
  
-
-                    # self.kidzone_status = 0
-
-        
         # 횡단보도에 사람 있을 때 속도가 있으면 -15
         if self.crosswalk_status == 1 and self.person_status == 1 and velocity > 0 and self.human_on_crosswalk_violation_prev == 0:
             self.penalty += human_on_crosswalk_violation   

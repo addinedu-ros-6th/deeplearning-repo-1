@@ -54,18 +54,18 @@ class WindowClass(QMainWindow, from_class):
             print("Logged in as regular user")
 
         # 소켓 설정
-        # self.socket_configuration()
-        # self.socket_configuration_sectionSpeedReader()
+        self.socket_configuration()
+        self.socket_configuration_sectionSpeedReader()
 
-        # self.data = b""
-        # self.payload_size = struct.calcsize("Q")
+        self.data = b""
+        self.payload_size = struct.calcsize("Q")
 
-        # # QSocketNotifier 설정 (읽기 가능할 때 알림 받음)
-        # self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
-        # self.socket_notifier.activated.connect(self.read_data)
+        # QSocketNotifier 설정 (읽기 가능할 때 알림 받음)
+        self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
+        self.socket_notifier.activated.connect(self.read_data)
 
-        # self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
-        # self.socket_notifier_2.activated.connect(self.read_data_2)
+        self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
+        self.socket_notifier_2.activated.connect(self.read_data_2)
         
         # DB 설정
         self.db_configuration()
@@ -115,10 +115,6 @@ class WindowClass(QMainWindow, from_class):
         self.tableWidget_1.setColumnWidth(5, 20)
 
         self.tableWidget_2.setColumnWidth(0, 130)
-
-        # 점수 lcd 설정
-        # self.palette = self.LCD_score.palette()
-        # self.palette.setColor(QPalette.WindowText, QColor(0, 255, 0))
 
         # 점수 차감
         self.judge = Judge()
@@ -224,8 +220,6 @@ class WindowClass(QMainWindow, from_class):
         except socket.error as e:
             print(f"Socket error: {e}")
 
-        # print(f"Listening on {self.host}:{self.port}...")
-    
     def socket_configuration_sectionSpeedReader(self, timeout=1):
         self.host_2 = '192.168.0.27'
         self.port_2 = 5555
@@ -343,8 +337,6 @@ class WindowClass(QMainWindow, from_class):
             self.update_label(detected_classes) 
             
             if self.penalty:
-                # self.palette.setColor(QPalette.WindowText, QColor(255, 0, 0))
-
                 self.score += self.penalty
                 print(self.score, self.penalty)
                 self.LCD_score.display(self.score)
