@@ -27,7 +27,7 @@ System Requirements
 ![image](https://github.com/user-attachments/assets/8953e560-ecbf-4fd0-a911-a5c6c3ff4053)
 
 ## 1.7 도로 트랙 도면
-![트랙 캡쳐](https://github.com/user-attachments/assets/769597ad-2f9f-42fa-b5db-c63e1374a82f)
+![트랙](https://github.com/user-attachments/assets/83fda8e7-bf95-4f0f-90b7-91ed6fcf8df1)
 
 
 ## 1.7 GUI 구버전
