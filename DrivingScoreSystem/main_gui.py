@@ -140,51 +140,12 @@ class WindowClass(QMainWindow, from_class):
             self.socket_notifier.setEnabled(False)
             self.socket_notifier_2.setEnabled(False)
 
-            # query = f"select pl.time, pl.speed, pd.penalty_type, pd.penalty_score, \
-            #             pl.score, pl.image_path, pl.image_name, pl.json_data \
-            #             from PenaltyLog pl, PenaltyData pd \
-            #             where (pl.user_id = {self.user_id}) and (pl.penalty_id = pd.id);"
-            # self.cursor.execute(query)
-            # results = self.cursor.fetchall()
-
-            # self.tableWidget_1.setRowCount(len(results))
-
-            # for i, result in enumerate(results):
-                
-            #     date_time, speed, penalty_type, penalty_score, score, image_path, image_name, json_data = result
-            #     date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
-            #     self.tableWidget_1.setItem(i, 0, QTableWidgetItem(date_time_str))
-            #     self.tableWidget_1.setItem(i, 1, QTableWidgetItem(self.car_number))
-            #     self.tableWidget_1.setItem(i, 2, QTableWidgetItem(str(score)))
-            #     self.tableWidget_1.setItem(i, 3, QTableWidgetItem(penalty_type))
-            #     self.tableWidget_1.setItem(i, 4, QTableWidgetItem(str(penalty_score)))
-            #     self.tableWidget_1.setItem(i, 5, QTableWidgetItem(str(speed)))
-            #     self.tableWidget_1.setItem(i, 6, QTableWidgetItem(image_path))
-            #     self.tableWidget_1.setItem(i, 7, QTableWidgetItem(image_name))
-            #     self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
             self.load_user_db()
         
         if index == 2:
             self.socket_notifier.setEnabled(False)
             self.socket_notifier_2.setEnabled(False)
 
-            # query = f"select ol.time, ud.car_number, od.objects, ol.image_path, ol.image_name, ol.json_data \
-            #             from ObjectLog ol, ObjectData od, UserData ud \
-            #             where (ol.user_id = ud.id) and (ol.object_id = od.id);"
-            # self.cursor.execute(query)
-            # results = self.cursor.fetchall()
-
-            # self.tableWidget_2.setRowCount(len(results))
-
-            # for i, result in enumerate(results):
-            #     date_time, car_number, _object, image_path, image_name, json_data = result
-            #     date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
-            #     self.tableWidget_2.setItem(i, 0, QTableWidgetItem(date_time_str))
-            #     self.tableWidget_2.setItem(i, 1, QTableWidgetItem(car_number))
-            #     self.tableWidget_2.setItem(i, 2, QTableWidgetItem(_object))
-            #     self.tableWidget_2.setItem(i, 3, QTableWidgetItem(image_path))
-            #     self.tableWidget_2.setItem(i, 4, QTableWidgetItem(image_name))
-            #     self.tableWidget_2.setItem(i, 5, QTableWidgetItem(json_data))
             self.load_admin_db()
 
     def socket_configuration(self, timeout=1):
@@ -450,12 +411,26 @@ class WindowClass(QMainWindow, from_class):
             for i, result in enumerate(results):
                 date_time, speed, penalty_type, penalty_score, score, image_path, image_name, json_data = result
                 date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
-                self.tableWidget_1.setItem(i, 0, QTableWidgetItem(date_time_str))
-                self.tableWidget_1.setItem(i, 1, QTableWidgetItem(self.car_number))
-                self.tableWidget_1.setItem(i, 2, QTableWidgetItem(str(score)))
-                self.tableWidget_1.setItem(i, 3, QTableWidgetItem(penalty_type))
-                self.tableWidget_1.setItem(i, 4, QTableWidgetItem(str(penalty_score)))
-                self.tableWidget_1.setItem(i, 5, QTableWidgetItem(str(speed)))
+
+                item_1 = QTableWidgetItem(date_time_str)
+                item_2 = QTableWidgetItem(self.car_number)
+                item_3 = QTableWidgetItem(str(score))
+                item_4 = QTableWidgetItem(penalty_type)
+                item_5 = QTableWidgetItem(str(penalty_score))
+                item_6 = QTableWidgetItem(str(speed))
+                item_1.setTextAlignment(Qt.AlignCenter)
+                item_2.setTextAlignment(Qt.AlignCenter)
+                item_3.setTextAlignment(Qt.AlignCenter)
+                item_4.setTextAlignment(Qt.AlignCenter)
+                item_5.setTextAlignment(Qt.AlignCenter)
+                item_6.setTextAlignment(Qt.AlignCenter)
+
+                self.tableWidget_1.setItem(i, 0, item_1)
+                self.tableWidget_1.setItem(i, 1, item_2)
+                self.tableWidget_1.setItem(i, 2, item_3)
+                self.tableWidget_1.setItem(i, 3, item_4)
+                self.tableWidget_1.setItem(i, 4, item_5)
+                self.tableWidget_1.setItem(i, 5, item_6)
                 self.tableWidget_1.setItem(i, 6, QTableWidgetItem(image_path))
                 self.tableWidget_1.setItem(i, 7, QTableWidgetItem(image_name))
                 self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
@@ -513,9 +488,17 @@ class WindowClass(QMainWindow, from_class):
             for i, result in enumerate(results):
                 date_time, car_number, _object, image_path, image_name, json_data = result
                 date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
-                self.tableWidget_2.setItem(i, 0, QTableWidgetItem(date_time_str))
-                self.tableWidget_2.setItem(i, 1, QTableWidgetItem(car_number))
-                self.tableWidget_2.setItem(i, 2, QTableWidgetItem(_object))
+
+                item_1 = QTableWidgetItem(date_time_str)
+                item_2 = QTableWidgetItem(car_number)
+                item_3 = QTableWidgetItem(_object)
+                item_1.setTextAlignment(Qt.AlignCenter)
+                item_2.setTextAlignment(Qt.AlignCenter)
+                item_3.setTextAlignment(Qt.AlignCenter)
+
+                self.tableWidget_2.setItem(i, 0, item_1)
+                self.tableWidget_2.setItem(i, 1, item_2)
+                self.tableWidget_2.setItem(i, 2, item_3)
                 self.tableWidget_2.setItem(i, 3, QTableWidgetItem(image_path))
                 self.tableWidget_2.setItem(i, 4, QTableWidgetItem(image_name))
                 self.tableWidget_2.setItem(i, 5, QTableWidgetItem(json_data))
@@ -527,7 +510,6 @@ class WindowClass(QMainWindow, from_class):
             QMessageBox.warning(self, "오류", f"데이터를 불러오는 중 오류가 발생했습니다: {str(e)}")
 
     def open_new_window(self, image_path, image_name, json_data):
-        # 이미지에 박스 그리고 보여주기
         image = cv2.imread(image_path + image_name)
         for data in json_data:
             cls = data['name']
@@ -543,7 +525,6 @@ class WindowClass(QMainWindow, from_class):
             cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 2)
             cv2.putText(image, cls, (x1 + 40, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
 
-        # 새로운 창을 생성하고 이미지를 보여줌
         image_window = ImageWindow(image)
         image_window.show_image()
 
