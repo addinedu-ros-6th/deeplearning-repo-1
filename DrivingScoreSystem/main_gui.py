@@ -352,7 +352,6 @@ class WindowClass(QMainWindow, from_class):
         self.conn.commit()
 
     def update_label(self, detected_classes):
-        # set 데이터를 문자열로 변환하여 표시 (콤마로 구분)
         label_text = ",\n".join(detected_classes)
         self.label_status_desc.setText(label_text)
     
@@ -527,7 +526,7 @@ class WindowClass(QMainWindow, from_class):
             image_window = ImageWindow(image)
             image_window.show_image()
         
-        except AttributeError as e:
+        except AttributeError:
             QMessageBox.warning(self, "오류", "사진이 존재하지 않습니다.")
 
     def table1_dclicked(self, row, col):

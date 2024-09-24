@@ -16,7 +16,7 @@ db_config = {
 class LoginDialog(QtWidgets.QDialog):
     def __init__(self):
         super(LoginDialog, self).__init__()
-        uic.loadUi("./ui/login_gui.ui", self)  # login.ui 파일을 로드합니다.
+        uic.loadUi("./ui/login_gui.ui", self)
         self.login_button.clicked.connect(self.handle_login)
 
         self.isAdmin = False
@@ -49,7 +49,7 @@ class LoginDialog(QtWidgets.QDialog):
                     os.makedirs(user_pic_dir)
 
                 QMessageBox.information(self, "Success", "Login successful!")
-                self.accept()  # 로그인 성공 시 창을 닫음
+                self.accept()
             else:
                 QMessageBox.warning(self, "Error", "Invalid username or password!")
 

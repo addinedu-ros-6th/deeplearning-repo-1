@@ -3,23 +3,9 @@ import numpy as np
 import cv2
 import time
 
-'''
-PenaltyData table:
-id  penalty_type                    penalty_score
-1   kidzone_speed_violation         30
-2   section_speed_violation         10
-3   speed_violation                 20
-4   traffic_sign_green_violation    15
-5   traffic_sign_red_violation      15
-6   stop_line_violation             10
-7   lane_violation                  5
-8   human_on_crosswalk_violation    15
-'''
 
 class Judge:
     def __init__(self):
-        self.charge = ""
-        
         length = 5
         self.lane = deque(maxlen=length)
         self.dotted_lane = deque(maxlen=length)
@@ -113,7 +99,6 @@ class Judge:
         self.objects_list = set()
         self.objects_cnt = len(self.objects_list)
         self.is_new_object = False
-        # print('section_speed========================',section_speed)
         self.detected_classes = set()
 
         charge_id = 0
@@ -138,8 +123,6 @@ class Judge:
                 self.detected[idx].append(True)
             else:
                 self.detected[idx].append(False)
-
-        # print(detects)
         
         for detect in detects:
             self.detected_classes.update(detect.keys())
@@ -216,7 +199,6 @@ class Judge:
                     self.traffic_light_yellow_status = 1  
 
                 elif cls == "traffic_light_red" and (len(self.traffic_light_red) == 5) and (self.traffic_light_red.count(True) >= detect_count):
-                    # if area > 1100:
                     self.traffic_light_red_status = 1
                        
                 elif cls == "person" and (len(self.person) == 5) and (self.person.count(True) >= detect_count):
@@ -300,7 +282,6 @@ class Judge:
             'person': ('person_status', 'person_miss_count')
         }
 
-        # print("self.detected_classes", self.detected_classes)
         for cls, (status_attr, miss_count_attr) in status_mapping.items():
             if cls not in self.detected_classes:
                 # 감지되지 않으면 miss 카운터 증가
