@@ -13,7 +13,7 @@
 | 3주차 | 09.05 ~ 09.20 | 361시간 | 딥러닝 | opencv , python, cuda | 5명 | 
 | 3주차 | 09.05 ~ 09.13 |  121시간 | 트랙설계 및 설치 | autocad , 구조물 | 5명 | 
 | 4주차 | 09.14 ~ 09.21 | 168시간 | 기능구현 | ubunto, python, <br> vscode, arduino , minibot  | 5명|
-| 5주차 | 09.20 ~ 09.23 | 72시간 | 연동테스트 | 도로, minibot | 5명 |
+| 5주차 | 09.20 ~ 09.25 | 72시간 | 연동테스트, PPT 자료 준비 | 도로, minibot | 5명 |
 
 ## 1.4 구현 기능 및 관련 기술
 System Requirements
@@ -31,10 +31,33 @@ System Requirements
 
 
 
-## 1.7 GUI
+## 1.7 GUI 구버전
 ![image](https://github.com/user-attachments/assets/a0c5b6f5-c8e7-45d0-9604-5001bf06335f)
 ![image](https://github.com/user-attachments/assets/010d945e-5b8e-47d9-912a-b6a479eabe97)
 ![image](https://github.com/user-attachments/assets/b9c7c3d3-78ed-4a7e-b50d-ec2b1353b3b6)
 ![image](https://github.com/user-attachments/assets/ecba9bd2-0d1c-4a7b-8289-8dcd2c700c56)
+
+## 1.8 GUI 신버전
+![image](https://github.com/user-attachments/assets/fd922f63-4847-4ad8-b47a-99d1813e7188)
+![image](https://github.com/user-attachments/assets/822794eb-30bf-42dd-86f1-415339d7b2f4)
+![image](https://github.com/user-attachments/assets/db738b97-7717-46d0-83c8-55ef712b0d87)
+
+
+
+
+## 1.8 프로그램 실행
+```
+python3 main.py 실행
+```
+## 1.9 실행
+![output_20240924_180932](https://github.com/user-attachments/assets/b0e36a43-b6ba-429f-bbad-f12ce942911d)
+
+## 2 minibot 동작 및 딥러닝 학습 도출 결과 확인
+Accuracy 정확도 확인
+
+
+
+
+
 
 
