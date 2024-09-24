@@ -1,6 +1,7 @@
 from collections import deque
 import numpy as np
 import cv2
+import time
 
 '''
 PenaltyData table:
@@ -72,9 +73,12 @@ class Judge:
         self.traffic_light_yellow_miss_count = 0
         self.traffic_light_red_miss_count = 0
         self.person_miss_count = 0
-
+        self.redzone_miss_count = 0
+        self.detect_light_green_time = 0
+        
         self.stop_line_status_prev = 0
         self.kidzone_prev = 0
+        self.detect_light_green_time_prev = 0
 
         #벌점 사항
         self.stop_line_prev = 0
@@ -85,8 +89,12 @@ class Judge:
         self.green_signal_prev = 0
         self.limit_100_status_prev = 0
         self.speed_violation_prev = 0
-
-        # self.velocity = 30
+        self.traffic_sign_green_violation_prev = 0
+        self.traffic_sign_red_violation_prev = 0
+        self.stop_line_violation_prev = 0
+        self.human_on_crosswalk_violation_prev = 0
+        self.kidzone_speed_violation_30_prev = 0
+        self.section_speed_violation_prev = 0
 
         # 새로운 객체 감지
         self.objects_list = set()
@@ -105,7 +113,7 @@ class Judge:
         self.objects_list = set()
         self.objects_cnt = len(self.objects_list)
         self.is_new_object = False
-
+        # print('section_speed========================',section_speed)
         self.detected_classes = set()
 
         charge_id = 0
@@ -122,7 +130,7 @@ class Judge:
         lane_violation = 5
         human_on_crosswalk_violation = 15
    
-        self.penalty = 0
+        self.penalty = 0    
 
         # 탐지된 객체 업데이트
         for idx in range(len(self.detected)):
@@ -164,13 +172,13 @@ class Judge:
                     self.yellow_lane_status = 1
 
                 elif cls == "stop_line" and (len(self.stop_line) == 5) and (self.stop_line.count(True) >= detect_count):
-                    if area > 10000:    
+                    if area > 8000:    
                         self.stop_line_status = 1
                         self.stop_line_status_prev = 1
 
                 elif cls == "crosswalk" and (len(self.crosswalk) == 5) and (self.crosswalk.count(True) >= detect_count):
-                    if area > 50000:
-                        self.crosswalk_status = 1
+                    if area > 20000:
+                        self.crosswalk_status = 1  
 
                 elif cls == "limit_30" and (len(self.limit_30) == 5) and (self.limit_30.count(True) >= detect_count):
                     self.limit_30_status = 1  
@@ -200,6 +208,9 @@ class Judge:
 
                 elif cls == "traffic_light_green" and (len(self.traffic_light_green) == 5) and (self.traffic_light_green.count(True) >= detect_count):
                     self.traffic_light_green_status = 1  
+                    if self.detect_light_green_time_prev == 0 and velocity == 0:
+                        self.detect_light_green_time = time.time()
+                        self.detect_light_green_time_prev = 1
 
                 elif cls == "traffic_light_yellow" and (len(self.traffic_light_yellow) == 5) and (self.traffic_light_yellow.count(True) >= detect_count):
                     self.traffic_light_yellow_status = 1  
@@ -213,19 +224,22 @@ class Judge:
                         self.person_status = 1
 
         if (self.kidzone_status == 1) or (self.redzone_status == 1):
+           
             # Step 2: Detect red lane markers only
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
             lower_red1 = np.array([0, 100, 100])
             upper_red1 = np.array([10, 255, 255])
             lower_red2 = np.array([160, 100, 100])
             upper_red2 = np.array([180, 255, 255])
+
 
             red_mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
             red_mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
             red_mask = cv2.bitwise_or(red_mask1, red_mask2)
 
             # 노이즈 제거
-            kernel = np.ones((5,5), np.uint8)
+            kernel = np.ones((30,30), np.uint8)
             red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
             red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_CLOSE, kernel)
 
@@ -234,16 +248,15 @@ class Judge:
             for contour in contours:
                 area = cv2.contourArea(contour)
                 if area > 4000:  # Ignore small noise
-                    # print("YES", "kidzone_status:", self.kidzone_status, "redzone_status:", self.redzone_status)
                     self.redzone_status = 1
+                    print("YES", "kidzone_status:", self.kidzone_status, "redzone_status:", self.redzone_status)
                     x, y, w, h = cv2.boundingRect(contour)
                     cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)  # Blue bounding box for lanes
                 else:
-                    # print("No", "kidzone_status:", self.kidzone_status, "redzone_status:", self.redzone_status)
                     self.redzone_status = 0
-                    # self.kidzone_status = 0
-
-
+                    print("No", "kidzone_status:", self.kidzone_status, "redzone_status:", self.redzone_status)
+                    continue
+ 
         # 횡단보도에 사람 있을 때 속도가 있으면 -15
         if self.crosswalk_status == 1 and self.person_status == 1 and velocity > 0 and self.human_on_crosswalk_violation_prev == 0:
             self.penalty += human_on_crosswalk_violation   
@@ -251,16 +264,19 @@ class Judge:
             charge_id = 8
             print("human_on_crosswalk_violation")
 
-        # 초록불이고 정지선이 있을 때 속도가 10보다 작으면 -15
-        if self.traffic_light_green == 1 and self.stop_line_status == 1 and velocity < 10 and self.traffic_sign_green_violation_prev == 0:
+        # 초록불일 때 3초동안 속도가 10보다 작으면 -15
+        if self.traffic_light_green_status == 1 and (time.time()-self.detect_light_green_time > 3) and velocity == 0 and self.traffic_sign_green_violation_prev == 0:
             self.penalty += traffic_sign_green_violation   
-            self.traffic_sign_green_violation_prev = 1
+            self.traffic_sign_green_violation_prev  = 1
+            self.detect_light_green_time_prev = 0
             charge_id = 4
             print("traffic_sign_green_violation")
 
          # 구간 단속 50 이상이면 -10
-        if int(section_speed) > 30: 
+        if int(section_speed) > 50 and self.section_speed_violation_prev == 0: 
             self.penalty += section_speed_violation
+            self.section_speed_violation_prev  = 1
+            charge_id = 2
             print("section_speed_violation")   
 
         
@@ -300,30 +316,28 @@ class Judge:
                 setattr(self, miss_count_attr, 0)
 
         # 신호등 빨간 불일 때 정지선이 있었다가 없을때 속도가 있으면 -15
-        if self.traffic_light_red_status == 1 and self.stop_line_status == 0 and self.stop_line_status_prev == 1 and velocity > 0 and self.traffic_sign_red_violation_prev == 0:
+        if self.traffic_light_red_status == 1 and self.stop_line_status == 0 and self.stop_line_status_prev == 1 and velocity >= 10 and self.traffic_sign_red_violation_prev == 0:
             self.penalty += traffic_sign_red_violation   
-            self.traffic_sign_red_violation_prev = 0
+            self.traffic_sign_red_violation_prev = 1
             charge_id = 5
             print("traffic_sign_red_violation")
 
         # 신호등 빨간 불일 때 정지선이 있었다가 없을때 속도가 0이면 -10
-        if self.traffic_light_red_status == 1 and self.stop_line_status == 0 and self.stop_line_status_prev == 1 and velocity == 0 and self.stop_line_violation_prev == 0:
+        if self.traffic_light_red_status == 1 and self.stop_line_status == 0 and self.stop_line_status_prev == 1 and velocity < 10 and self.stop_line_violation_prev == 0:
             self.penalty += stop_line_violation   
             self.stop_line_violation_prev = 1
             charge_id = 5
-            print("traffic_sign_red_violation")
+            print("stop_line_violation")
 
         # 어린이보호구역 표지판이 있다가 없어지고 빨간 영역이 있을때 속도가 30 초과이면 -30
-        if self.kidzone == 0 and self.kidzone_prev == 1 and self.redzone_status == 1 and velocity > 30 and self.kidzone_speed_violation_30_prev == 0:
+        if self.kidzone_status == 0 and self.kidzone_prev == 1 and self.redzone_status == 1 and velocity > 30 and self.kidzone_speed_violation_30_prev == 0:
             self.penalty += kidzone_speed_violation   
             self.kidzone_speed_violation_30_prev = 1
             charge_id = 1
             print("kidzone_speed_violation")
-        else:
-            self.kidzone_speed_violation_30_prev = 0
 
-        # 100 표지판이 보였다가 안보였을 때 속도가 100 이상이면 -10
-        if self.limit_100_status == 0 and self.limit_100_status_prev == 1 and velocity > 0 and self.speed_violation_prev == 0:
+        # 100 표지판이 보였다가 안보였을 때 속도가 100 이상이면 -20
+        if self.limit_100_status == 0 and self.limit_100_status_prev == 1 and velocity > 100 and self.speed_violation_prev == 0:
             self.penalty += speed_violation   
             self.speed_violation_prev = 1
             charge_id = 3

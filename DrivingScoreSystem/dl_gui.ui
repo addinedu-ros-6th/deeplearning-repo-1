@@ -29,7 +29,7 @@
     <enum>QTabWidget::North</enum>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="Main">
     <property name="font">
@@ -256,7 +256,7 @@
      </column>
      <column>
       <property name="text">
-       <string>name</string>
+       <string>car number</string>
       </property>
      </column>
      <column>
@@ -266,12 +266,12 @@
      </column>
      <column>
       <property name="text">
-       <string>minus reason</string>
+       <string>penalty type</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>minus score</string>
+       <string>penalty score</string>
       </property>
      </column>
      <column>
@@ -372,12 +372,12 @@
      </item>
      <item>
       <property name="text">
-       <string>penalty type</string>
+       <string>minus reason</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>penalty score</string>
+       <string>penalty</string>
       </property>
      </item>
      <item>
@@ -385,25 +385,6 @@
        <string>speed</string>
       </property>
      </item>
-    </widget>
-    <widget class="QLabel" name="label_preview_1">
-     <property name="geometry">
-      <rect>
-       <x>640</x>
-       <y>90</y>
-       <width>861</width>
-       <height>691</height>
-      </rect>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="text">
-      <string>Image Preview</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="object_log">
@@ -475,7 +456,7 @@
       </rect>
      </property>
      <property name="displayFormat">
-      <string>yy. M. d.  AP h:mm</string>
+      <string>yy. M. d. AP h:mm</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_4">
@@ -518,9 +499,6 @@
        <height>31</height>
       </rect>
      </property>
-     <property name="calendarPopup">
-      <bool>false</bool>
-     </property>
     </widget>
     <widget class="QLineEdit" name="lineEdit_2">
      <property name="geometry">
@@ -530,25 +508,6 @@
        <width>231</width>
        <height>31</height>
       </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_preview_2">
-     <property name="geometry">
-      <rect>
-       <x>640</x>
-       <y>90</y>
-       <width>861</width>
-       <height>691</height>
-      </rect>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="text">
-      <string>Image Preview</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
      </property>
     </widget>
     <widget class="QComboBox" name="comboBox_2">

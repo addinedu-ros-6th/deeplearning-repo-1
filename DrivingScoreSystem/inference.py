@@ -5,13 +5,18 @@ import json
 
 class Inference:
     def __init__(self):
+<<<<<<< HEAD
         self.model_lane = YOLO('/home/jh/dev_ws/dl_project/runs/segment/track_lane/weights/track_lane.pt')
         self.model_sign = YOLO('/home/jh/dev_ws/dl_project/runs/segment/track/weights/track_sign.pt')
+=======
+        self.model_lane = YOLO('../../models/track_lane.pt')
+        self.model_sign = YOLO('../../models/track_sign.pt')
+>>>>>>> 7d42595577f23eeb4786aa6ef56c724d1942e1b7
 
 
     def predict(self, frame: np.ndarray) -> tuple[np.ndarray, list[dict[str: tuple[int, int, int, int]]], set[int], list[list[dict]]]:
         results_lane = self.model_lane(frame, verbose=False)
-        results_sign = self.model_sign(frame, verbose=False)
+        results_sign = self.model_sign(frame, verbose=False,conf = 0.4)
 
         result_lane_json = results_lane[0].tojson()
         result_sign_json = results_sign[0].tojson()
