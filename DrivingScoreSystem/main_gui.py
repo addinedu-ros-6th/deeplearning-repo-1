@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QTableWidgetItem, QDialog, QApplication, QLabel, QVBoxLayout, QHeaderView
-from PyQt5.QtCore import QSocketNotifier
+from PyQt5.QtCore import QSocketNotifier, Qt
 from PyQt5.QtGui import *
 from PyQt5 import uic
 from PyQt5.QtCore import *
@@ -60,19 +60,19 @@ class WindowClass(QMainWindow, from_class):
             self.hide_admin_tab()
             print("Logged in as regular user")
 
-        # # 소켓 설정
-        # self.socket_configuration()
-        # self.socket_configuration_sectionSpeedReader()
+        # 소켓 설정
+        self.socket_configuration()
+        self.socket_configuration_sectionSpeedReader()
 
-        # self.data = b""
-        # self.payload_size = struct.calcsize("Q")
+        self.data = b""
+        self.payload_size = struct.calcsize("Q")
 
-        # # QSocketNotifier 설정 (읽기 가능할 때 알림 받음)
-        # self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
-        # self.socket_notifier.activated.connect(self.read_data)
+        # QSocketNotifier 설정 (읽기 가능할 때 알림 받음)
+        self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
+        self.socket_notifier.activated.connect(self.read_data)
 
-        # self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
-        # self.socket_notifier_2.activated.connect(self.read_data_2)
+        self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
+        self.socket_notifier_2.activated.connect(self.read_data_2)
         
         # DB 설정
         self.db_configuration()
@@ -81,10 +81,10 @@ class WindowClass(QMainWindow, from_class):
         self.model = Inference()
 
         # 첫번째 탭 열려있을 떄만 영상 받아오기
-        # self.Controll.currentChanged.connect(self.on_tab_change)
-        # if self.Controll.currentIndex() == 0:
-        #     self.socket_notifier.setEnabled(True)
-        #     self.socket_notifier_2.setEnabled(True)
+        self.Controll.currentChanged.connect(self.on_tab_change)
+        if self.Controll.currentIndex() == 0:
+            self.socket_notifier.setEnabled(True)
+            self.socket_notifier_2.setEnabled(True)
 
         # 버튼
         self.btn_logout.clicked.connect(self.end_session)
@@ -135,60 +135,57 @@ class WindowClass(QMainWindow, from_class):
         if index == 0:
             self.socket_notifier.setEnabled(True)
             self.socket_notifier_2.setEnabled(True)
-            # self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
-            # self.socket_notifier.activated.connect(self.read_data)
-
-            # self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
-            # self.socket_notifier_2.activated.connect(self.read_data_2)
         
         if index == 1:
             self.socket_notifier.setEnabled(False)
             self.socket_notifier_2.setEnabled(False)
 
-            query = f"select pl.time, pl.speed, pd.penalty_type, pd.penalty_score, \
-                        pl.score, pl.image_path, pl.image_name, pl.json_data \
-                        from PenaltyLog pl, PenaltyData pd \
-                        where (pl.user_id = {self.user_id}) and (pl.penalty_id = pd.id);"
-            self.cursor.execute(query)
-            results = self.cursor.fetchall()
+            # query = f"select pl.time, pl.speed, pd.penalty_type, pd.penalty_score, \
+            #             pl.score, pl.image_path, pl.image_name, pl.json_data \
+            #             from PenaltyLog pl, PenaltyData pd \
+            #             where (pl.user_id = {self.user_id}) and (pl.penalty_id = pd.id);"
+            # self.cursor.execute(query)
+            # results = self.cursor.fetchall()
 
-            self.tableWidget_1.setRowCount(len(results))
+            # self.tableWidget_1.setRowCount(len(results))
 
-            for i, result in enumerate(results):
+            # for i, result in enumerate(results):
                 
-                date_time, speed, penalty_type, penalty_score, score, image_path, image_name, json_data = result
-                date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
-                self.tableWidget_1.setItem(i, 0, QTableWidgetItem(date_time_str))
-                self.tableWidget_1.setItem(i, 1, QTableWidgetItem(self.car_number))
-                self.tableWidget_1.setItem(i, 2, QTableWidgetItem(str(score)))
-                self.tableWidget_1.setItem(i, 3, QTableWidgetItem(penalty_type))
-                self.tableWidget_1.setItem(i, 4, QTableWidgetItem(str(penalty_score)))
-                self.tableWidget_1.setItem(i, 5, QTableWidgetItem(str(speed)))
-                self.tableWidget_1.setItem(i, 6, QTableWidgetItem(image_path))
-                self.tableWidget_1.setItem(i, 7, QTableWidgetItem(image_name))
-                self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
+            #     date_time, speed, penalty_type, penalty_score, score, image_path, image_name, json_data = result
+            #     date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
+            #     self.tableWidget_1.setItem(i, 0, QTableWidgetItem(date_time_str))
+            #     self.tableWidget_1.setItem(i, 1, QTableWidgetItem(self.car_number))
+            #     self.tableWidget_1.setItem(i, 2, QTableWidgetItem(str(score)))
+            #     self.tableWidget_1.setItem(i, 3, QTableWidgetItem(penalty_type))
+            #     self.tableWidget_1.setItem(i, 4, QTableWidgetItem(str(penalty_score)))
+            #     self.tableWidget_1.setItem(i, 5, QTableWidgetItem(str(speed)))
+            #     self.tableWidget_1.setItem(i, 6, QTableWidgetItem(image_path))
+            #     self.tableWidget_1.setItem(i, 7, QTableWidgetItem(image_name))
+            #     self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
+            self.load_user_db()
         
         if index == 2:
             self.socket_notifier.setEnabled(False)
             self.socket_notifier_2.setEnabled(False)
 
-            query = f"select ol.time, ud.car_number, od.objects, ol.image_path, ol.image_name, ol.json_data \
-                        from ObjectLog ol, ObjectData od, UserData ud \
-                        where (ol.user_id = ud.id) and (ol.object_id = od.id);"
-            self.cursor.execute(query)
-            results = self.cursor.fetchall()
+            # query = f"select ol.time, ud.car_number, od.objects, ol.image_path, ol.image_name, ol.json_data \
+            #             from ObjectLog ol, ObjectData od, UserData ud \
+            #             where (ol.user_id = ud.id) and (ol.object_id = od.id);"
+            # self.cursor.execute(query)
+            # results = self.cursor.fetchall()
 
-            self.tableWidget_2.setRowCount(len(results))
+            # self.tableWidget_2.setRowCount(len(results))
 
-            for i, result in enumerate(results):
-                date_time, car_number, _object, image_path, image_name, json_data = result
-                date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
-                self.tableWidget_2.setItem(i, 0, QTableWidgetItem(date_time_str))
-                self.tableWidget_2.setItem(i, 1, QTableWidgetItem(car_number))
-                self.tableWidget_2.setItem(i, 2, QTableWidgetItem(_object))
-                self.tableWidget_2.setItem(i, 3, QTableWidgetItem(image_path))
-                self.tableWidget_2.setItem(i, 4, QTableWidgetItem(image_name))
-                self.tableWidget_2.setItem(i, 5, QTableWidgetItem(json_data))
+            # for i, result in enumerate(results):
+            #     date_time, car_number, _object, image_path, image_name, json_data = result
+            #     date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
+            #     self.tableWidget_2.setItem(i, 0, QTableWidgetItem(date_time_str))
+            #     self.tableWidget_2.setItem(i, 1, QTableWidgetItem(car_number))
+            #     self.tableWidget_2.setItem(i, 2, QTableWidgetItem(_object))
+            #     self.tableWidget_2.setItem(i, 3, QTableWidgetItem(image_path))
+            #     self.tableWidget_2.setItem(i, 4, QTableWidgetItem(image_name))
+            #     self.tableWidget_2.setItem(i, 5, QTableWidgetItem(json_data))
+            self.load_admin_db()
 
     def socket_configuration(self, timeout=1):
         self.host = '192.168.0.16'
@@ -343,12 +340,26 @@ class WindowClass(QMainWindow, from_class):
                     self.upload_new_object_data(object_id, _json)
                     cv2.imwrite(self.path_admin+self.file_name, frame)
             
-            if (self.score > 0) and (self.score < 20):
+            # 점수 색상 설정
+            if (self.score > 0) and (self.score < 30):
                 self.LCD_score.setStyleSheet('QLCDNumber{ color: rgb(220, 220, 0); }')
-            elif (self.score >= 20) and (self.score < 60):
+            elif (self.score >= 30) and (self.score < 60):
                 self.LCD_score.setStyleSheet('QLCDNumber{ color: rgb(220, 135, 0); }')
             elif self.score >= 60:
-                self.LCD_score.setStyleSheet('QLCDNumber{ color: rgb(255, 0, 0); }')
+                self.LCD_score.setStyleSheet('QLCDNumber{ color: rgb(220, 0, 0); }')
+            
+            # 속도 색상 설정
+            for detect in detects:
+                for k, i in detect.items():
+                    if k[:5] == 'limit':
+                        split = k.split('_')
+                        limit = split[-1]
+                        if self.velocity > limit:
+                            self.LCD_speed.setStyleSheet('QLCDNumber{ color: rgb(220, 0, 0); }')
+                        else:
+                            self.LCD_speed.setStyleSheet('QLCDNumber{ color: rgb(0, 0, 0); }')
+                    else:
+                        self.LCD_speed.setStyleSheet('QLCDNumber{ color: rgb(0, 0, 0); }')
 
         except Exception as e:
             pass#print(f"Error in show_frame: {e}")
@@ -428,12 +439,13 @@ class WindowClass(QMainWindow, from_class):
             self.tableWidget_1.setRowCount(len(results))
 
             header = self.tableWidget_1.horizontalHeader()       
-            header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
-            header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-            header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
-            header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
-            header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
-            header.setSectionResizeMode(5, QHeaderView.ResizeToContents)
+            # header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+            # header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+            # header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+            # header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+            # header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
+            # header.setSectionResizeMode(5, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(QHeaderView.Stretch)
 
             for i, result in enumerate(results):
                 date_time, speed, penalty_type, penalty_score, score, image_path, image_name, json_data = result
@@ -493,9 +505,10 @@ class WindowClass(QMainWindow, from_class):
             self.tableWidget_2.setRowCount(len(results))
 
             header = self.tableWidget_2.horizontalHeader()       
-            header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
-            header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-            header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+            # header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+            # header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+            # header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(QHeaderView.Stretch)
 
             for i, result in enumerate(results):
                 date_time, car_number, _object, image_path, image_name, json_data = result
