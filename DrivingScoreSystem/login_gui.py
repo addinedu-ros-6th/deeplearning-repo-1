@@ -16,14 +16,14 @@ db_config = {
 class LoginDialog(QtWidgets.QDialog):
     def __init__(self):
         super(LoginDialog, self).__init__()
-        uic.loadUi("./login_gui.ui", self)  # login.ui 파일을 로드합니다.
+        uic.loadUi("./ui/login_gui.ui", self)  # login.ui 파일을 로드합니다.
         self.login_button.clicked.connect(self.handle_login)
 
         self.isAdmin = False
         self.name = ""
 
-        self.path_user = "../pictures/user_log/"
-        self.path_admin = "../pictures/admin_log/"
+        self.path_user = "./pictures/user_log/"
+        self.path_admin = "./pictures/admin_log/"
 
     def handle_login(self):
         username = self.username_input.text()

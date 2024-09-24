@@ -14,10 +14,10 @@ import datetime
 import json
 import sys
 
-from inference import Inference
-from judge import Judge
+from DrivingScoreSystem.inference import Inference
+from DrivingScoreSystem.judge import Judge
 
-import login_gui
+import DrivingScoreSystem.login_gui
 
 '''
 TODO
@@ -30,11 +30,11 @@ TODO
 
 app = QApplication(sys.argv)
 window = QMainWindow()
-with open("./Toolery.qss", 'r') as file:
+with open("./ui/Toolery.qss", 'r') as file:
         qss = file.read()
         app.setStyleSheet(qss)
 
-from_class = uic.loadUiType('./dl_gui.ui')[0]
+from_class = uic.loadUiType('./ui/dl_gui.ui')[0]
 
 class WindowClass(QMainWindow, from_class):
     def __init__(self, id, isAdmin, number):
@@ -116,8 +116,8 @@ class WindowClass(QMainWindow, from_class):
         self.LCD_score.display(self.score)
         self.penalty = 0
 
-        self.path_user = '../pictures/user_log/' + self.car_number + '/'
-        self.path_admin = '../pictures/admin_log/' + self.car_number + '/'
+        self.path_user = './pictures/user_log/' + self.car_number + '/'
+        self.path_admin = './pictures/admin_log/' + self.car_number + '/'
 
     def __del__(self):
         self.client_socket.close()
@@ -323,7 +323,7 @@ class WindowClass(QMainWindow, from_class):
                         self.LCD_speed.setStyleSheet('QLCDNumber{ color: rgb(0, 0, 0); }')
 
         except Exception as e:
-            pass#print(f"Error in show_frame: {e}")
+            print(f"Error in show_frame: {e}")
 
     def update_label(self, detected_classes):
         label_text = ",\n".join(detected_classes)
@@ -399,13 +399,7 @@ class WindowClass(QMainWindow, from_class):
 
             self.tableWidget_1.setRowCount(len(results))
 
-            header = self.tableWidget_1.horizontalHeader()       
-            # header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
-            # header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-            # header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
-            # header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
-            # header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
-            # header.setSectionResizeMode(5, QHeaderView.ResizeToContents)
+            header = self.tableWidget_1.horizontalHeader()
             header.setSectionResizeMode(QHeaderView.Stretch)
 
             for i, result in enumerate(results):
@@ -434,6 +428,11 @@ class WindowClass(QMainWindow, from_class):
                 self.tableWidget_1.setItem(i, 6, QTableWidgetItem(image_path))
                 self.tableWidget_1.setItem(i, 7, QTableWidgetItem(image_name))
                 self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
+            
+            self.tableWidget_1.sortItems(0, Qt.DescendingOrder)
+
+            if len(results) == 0:
+                QMessageBox.warning(self, "검색 결과", "선택한 조건에 맞는 데이터가 없습니다.")
         
         except Exception as e:
             print(f"Error details: {str(e)}")
@@ -480,9 +479,6 @@ class WindowClass(QMainWindow, from_class):
             self.tableWidget_2.setRowCount(len(results))
 
             header = self.tableWidget_2.horizontalHeader()       
-            # header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
-            # header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-            # header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
             header.setSectionResizeMode(QHeaderView.Stretch)
 
             for i, result in enumerate(results):
@@ -503,6 +499,8 @@ class WindowClass(QMainWindow, from_class):
                 self.tableWidget_2.setItem(i, 4, QTableWidgetItem(image_name))
                 self.tableWidget_2.setItem(i, 5, QTableWidgetItem(json_data))
             
+            self.tableWidget_2.sortItems(0, Qt.DescendingOrder)
+            
             if len(results) == 0:
                 QMessageBox.warning(self, "검색 결과", "선택한 조건에 맞는 데이터가 없습니다.")
         
@@ -510,23 +508,27 @@ class WindowClass(QMainWindow, from_class):
             QMessageBox.warning(self, "오류", f"데이터를 불러오는 중 오류가 발생했습니다: {str(e)}")
 
     def open_new_window(self, image_path, image_name, json_data):
-        image = cv2.imread(image_path + image_name)
-        for data in json_data:
-            cls = data['name']
-            conf = data['confidence']
-            x1, x2, y1, y2 = data['box'].values()
-            x1 = int(x1)
-            x2 = int(x2)
-            y1 = int(y1)
-            y2 = int(y2)
+        try:
+            image = cv2.imread(image_path + image_name)
+            for data in json_data:
+                cls = data['name']
+                conf = data['confidence']
+                x1, x2, y1, y2 = data['box'].values()
+                x1 = int(x1)
+                x2 = int(x2)
+                y1 = int(y1)
+                y2 = int(y2)
 
-            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
-            label = f'{conf:.2f}'
-            cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 2)
-            cv2.putText(image, cls, (x1 + 40, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
+                cv2.rectangle(image, (x1, y1), (x2, y2), (0, 0, 255), 2)
+                label = f'{conf:.2f}'
+                cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 2)
+                cv2.putText(image, cls, (x1 + 40, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 2)
 
-        image_window = ImageWindow(image)
-        image_window.show_image()
+            image_window = ImageWindow(image)
+            image_window.show_image()
+        
+        except AttributeError as e:
+            QMessageBox.warning(self, "오류", "사진이 존재하지 않습니다.")
 
     def table1_dclicked(self, row, col):
         image_path = self.tableWidget_1.item(row, 6).text()
@@ -547,7 +549,7 @@ class WindowClass(QMainWindow, from_class):
         self.show_login()
     
     def show_login(self):
-        login_dialog = login_gui.LoginDialog()
+        login_dialog = DrivingScoreSystem.login_gui.LoginDialog()
         if login_dialog.exec_() == QDialog.Accepted:
             self.show()
 
