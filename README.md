@@ -1,4 +1,4 @@
-## 1 프로젝트 소개
+![트랙 캡쳐](https://github.com/user-attachments/assets/79cdc085-68dd-4601-b638-9de7f8640715)## 1 프로젝트 소개
 
 ##  1.1 개요
 - Camera 웹캠을 활용한 벌점 시스템을 이용하여 난폭운전감지하는 프로젝트
@@ -27,8 +27,7 @@ System Requirements
 ![image](https://github.com/user-attachments/assets/8953e560-ecbf-4fd0-a911-a5c6c3ff4053)
 
 ## 1.7 도로 트랙 도면
-![image](https://github.com/user-attachments/assets/f483455e-ab9b-4e39-af5f-001f7980428f)
-
+![트랙 캡쳐](https://github.com/user-attachments/assets/769597ad-2f9f-42fa-b5db-c63e1374a82f)
 
 
 ## 1.7 GUI 구버전
