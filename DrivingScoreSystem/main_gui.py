@@ -60,19 +60,19 @@ class WindowClass(QMainWindow, from_class):
             self.hide_admin_tab()
             print("Logged in as regular user")
 
-        # 소켓 설정
-        self.socket_configuration()
-        self.socket_configuration_sectionSpeedReader()
+        # # 소켓 설정
+        # self.socket_configuration()
+        # self.socket_configuration_sectionSpeedReader()
 
-        self.data = b""
-        self.payload_size = struct.calcsize("Q")
+        # self.data = b""
+        # self.payload_size = struct.calcsize("Q")
 
-        # QSocketNotifier 설정 (읽기 가능할 때 알림 받음)
-        self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
-        self.socket_notifier.activated.connect(self.read_data)
+        # # QSocketNotifier 설정 (읽기 가능할 때 알림 받음)
+        # self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
+        # self.socket_notifier.activated.connect(self.read_data)
 
-        self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
-        self.socket_notifier_2.activated.connect(self.read_data_2)
+        # self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
+        # self.socket_notifier_2.activated.connect(self.read_data_2)
         
         # DB 설정
         self.db_configuration()
@@ -81,16 +81,10 @@ class WindowClass(QMainWindow, from_class):
         self.model = Inference()
 
         # 첫번째 탭 열려있을 떄만 영상 받아오기
-        self.Controll.currentChanged.connect(self.on_tab_change)
-        if self.Controll.currentIndex() == 0:
-            self.socket_notifier.setEnabled(True)
-            self.socket_notifier_2.setEnabled(True)
-
-            # self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
-            # self.socket_notifier.activated.connect(self.read_data)
-
-            # self.socket_notifier_2 = QSocketNotifier(self.client_socket_2.fileno(), QSocketNotifier.Read)
-            # self.socket_notifier_2.activated.connect(self.read_data_2)
+        # self.Controll.currentChanged.connect(self.on_tab_change)
+        # if self.Controll.currentIndex() == 0:
+        #     self.socket_notifier.setEnabled(True)
+        #     self.socket_notifier_2.setEnabled(True)
 
         # 버튼
         self.btn_logout.clicked.connect(self.end_session)
@@ -114,14 +108,6 @@ class WindowClass(QMainWindow, from_class):
         self.tableWidget_2.setColumnHidden(3, True)
         self.tableWidget_2.setColumnHidden(4, True)
         self.tableWidget_2.setColumnHidden(5, True)
-
-        # self.tableWidget_1.setColumnWidth(0, 130)
-        # self.tableWidget_1.setColumnWidth(1, 80)
-        # self.tableWidget_1.setColumnWidth(2, 40)
-        # self.tableWidget_1.setColumnWidth(4, 20)
-        # self.tableWidget_1.setColumnWidth(5, 20)
-
-        # self.tableWidget_2.setColumnWidth(0, 130)
 
         # 점수 차감
         self.judge = Judge()
@@ -147,7 +133,6 @@ class WindowClass(QMainWindow, from_class):
     
     def on_tab_change(self, index):
         if index == 0:
-            print("index: 0")
             self.socket_notifier.setEnabled(True)
             self.socket_notifier_2.setEnabled(True)
             # self.socket_notifier = QSocketNotifier(self.client_socket.fileno(), QSocketNotifier.Read)
@@ -157,7 +142,6 @@ class WindowClass(QMainWindow, from_class):
             # self.socket_notifier_2.activated.connect(self.read_data_2)
         
         if index == 1:
-            print("index: 1")
             self.socket_notifier.setEnabled(False)
             self.socket_notifier_2.setEnabled(False)
 
@@ -185,7 +169,6 @@ class WindowClass(QMainWindow, from_class):
                 self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
         
         if index == 2:
-            print("index 2")
             self.socket_notifier.setEnabled(False)
             self.socket_notifier_2.setEnabled(False)
 
