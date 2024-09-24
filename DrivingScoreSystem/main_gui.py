@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QTableWidgetItem, QDialog
+import sys
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QTableWidgetItem, QDialog,QApplication
 from PyQt5.QtCore import QSocketNotifier
 from PyQt5.QtGui import *
 from PyQt5 import uic
@@ -6,7 +7,7 @@ from PyQt5.QtCore import *
 import cv2
 import mysql
 import numpy as np
-
+from PyQt5 import QtWidgets
 import socket
 import struct
 import pickle
@@ -26,7 +27,12 @@ TODO
 - LCD 색 바뀌는거 작동 확인 하기
 - 
 '''
-
+app = QApplication(sys.argv)
+window = QMainWindow()
+with open("/home/jh/dev_ws/dl_project/adf/Toolery.qss", 'r') as file:
+        qss = file.read()
+        app.setStyleSheet(qss)
+    
 from_class = uic.loadUiType('./dl_gui.ui')[0]
 
 class WindowClass(QMainWindow, from_class):
@@ -479,9 +485,9 @@ class WindowClass(QMainWindow, from_class):
         if search_text:  # 수정된 부분
             if search_option == 'All':
                 additional_condition = """
-                AND (ud.car_number LIKE %s OR od.objects LIKE %s OR ol.time LIKE %s)
+                AND (ud.car_number LIKE %s OR od.objects LIKE %s)
                 """
-                search_params = (f"%{search_text}%", f"%{search_text}%", f"%{search_text}%")
+                search_params = (f"%{search_text}%", f"%{search_text}%")
             elif search_option == 'plate':
                 additional_condition = "AND ud.car_number LIKE %s"
                 search_params = (f"%{search_text}%",)
