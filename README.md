@@ -38,8 +38,8 @@ System Requirements
 ![image](https://github.com/user-attachments/assets/ecba9bd2-0d1c-4a7b-8289-8dcd2c700c56)
 
 ## 1.8 GUI 신버전
-![image](https://github.com/user-attachments/assets/fd922f63-4847-4ad8-b47a-99d1813e7188)
-![image](https://github.com/user-attachments/assets/822794eb-30bf-42dd-86f1-415339d7b2f4)
+![Screenshot from 2024-09-24 18-13-04](https://github.com/user-attachments/assets/6554c368-3219-4772-bcf2-67263a1b77a7)
+![Screenshot from 2024-09-24 18-13-24](https://github.com/user-attachments/assets/8f250aec-accd-4722-8b47-719b043f53f4)
 ![image](https://github.com/user-attachments/assets/db738b97-7717-46d0-83c8-55ef712b0d87)
 
 
