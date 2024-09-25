@@ -47,14 +47,28 @@ System Requirements
 
 ## 1.8 프로그램 실행
 ```
+cd dev_ws
+```
+
+```
+cd deeplearning-repo-1
+```
+
+```
 python3 main.py 실행
 ```
 ## 1.9 실행
 ![output_20240924_180932](https://github.com/user-attachments/assets/b0e36a43-b6ba-429f-bbad-f12ce942911d)
 
 ## 2 minibot 동작 및 딥러닝 학습 도출 결과 확인
-Accuracy 정확도 확인
+바운딩박스 Accuracy 정확도 확인
 
+![StopLine_NG](https://github.com/user-attachments/assets/e473bbc7-001d-4ab2-954a-f463fa1e89eb)<br>
+![trafficLigth_Red_NG](https://github.com/user-attachments/assets/07b0898e-1c66-4586-94d7-aaf8d73a50e7)<br>
+![tracfficLight_green_NG](https://github.com/user-attachments/assets/0a38ab38-7603-4699-a668-79e10c1e54f7)<br>
+![crosswalk_on_Human_OK-min](https://github.com/user-attachments/assets/6e00b5c3-43ec-4d55-9247-a32465798d4b)<br>
+![kidzone_30_NG](https://github.com/user-attachments/assets/f94e1cca-c3b3-4f4f-8c1e-45ab9242b9c3)<br>
+![log_video1-ezgif com-optimize (1)](https://github.com/user-attachments/assets/9d31c3db-b6a1-4414-b2c5-aad61207e332)
 
 
 
