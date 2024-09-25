@@ -190,10 +190,10 @@ class WindowClass(QMainWindow, from_class):
 
     def db_configuration(self):
         db_config = {
-            'host': 'database-1.cpog6osggiv3.ap-northeast-2.rds.amazonaws.com',
-            'user': 'arduino_PJT',
-            'password': '1234',
-            'database': 'ardumension'
+            'host': '****',
+            'user': '****',
+            'password': '****',
+            'database': '****'
         }
 
         print("connecting to database...")
