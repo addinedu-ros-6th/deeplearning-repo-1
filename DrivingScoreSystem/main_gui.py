@@ -19,14 +19,6 @@ from DrivingScoreSystem.judge import Judge
 
 import DrivingScoreSystem.login_gui
 
-'''
-TODO
-- 어보 빨간색 도로 처리하기
-- 로그 검색기능 완성하기
-- 활성화 되어있는 탭만 작동하게 하기
-- LCD 색 바뀌는거 작동 확인 하기
-- 
-'''
 
 app = QApplication(sys.argv)
 window = QMainWindow()
