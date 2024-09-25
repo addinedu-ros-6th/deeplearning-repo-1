@@ -169,7 +169,7 @@ class WindowClass(QMainWindow, from_class):
             print(f"Socket error: {e}")
 
     def socket_configuration_sectionSpeedReader(self, timeout=1):
-        self.host_2 = '192.168.0.129'
+        self.host_2 = '192.168.0.27'
         self.port_2 = 5555
 
         self.client_socket_2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -234,7 +234,7 @@ class WindowClass(QMainWindow, from_class):
             
             # 정수형으로 변환
             self.velocity = int(self.velocity)
-            self.velocity_static = 30
+            self.velocity_static = -20
             if self.velocity > 80:
                 self.velocity =self.velocity_static + self.velocity
             self.LCD_speed.display(self.velocity)
@@ -315,7 +315,7 @@ class WindowClass(QMainWindow, from_class):
                     if k[:5] == 'limit':
                         split = k.split('_')
                         limit = split[-1]
-                        if self.velocity > limit:
+                        if self.velocity > int(limit):
                             self.LCD_speed.setStyleSheet('QLCDNumber{ color: rgb(220, 0, 0); }')
                         else:
                             self.LCD_speed.setStyleSheet('QLCDNumber{ color: rgb(0, 0, 0); }')
@@ -346,7 +346,7 @@ class WindowClass(QMainWindow, from_class):
             for _dict in json_list:
                 json_new.append({key: _dict[key] for key in ['name', 'class', 'confidence', 'box']})
         json_new = json.dumps(json_new)
-        insert = f'''insert into ObjectLog values ('{self.now}', {self.user_id}, {object_id}, '{self.path_admin}', """{json_new}""", '{self.file_name}')'''
+        insert = f'''insert into ObjectLog values ('{self.now}', {self.user_id}, {object_id}, '{self.path_admin}', '{json_new}', '{self.file_name}')'''
 
         self.cursor.execute(insert)
         self.conn.commit()
@@ -403,7 +403,7 @@ class WindowClass(QMainWindow, from_class):
 
             for i, result in enumerate(results):
                 date_time, speed, penalty_type, penalty_score, score, image_path, image_name, json_data = result
-                date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
+                date_time_str = date_time.strftime("%Y-%m-%d %H:%M:%S")
 
                 item_1 = QTableWidgetItem(date_time_str)
                 item_2 = QTableWidgetItem(self.car_number)
@@ -428,7 +428,7 @@ class WindowClass(QMainWindow, from_class):
                 self.tableWidget_1.setItem(i, 7, QTableWidgetItem(image_name))
                 self.tableWidget_1.setItem(i, 8, QTableWidgetItem(json_data))
             
-            self.tableWidget_1.sortItems(0, Qt.DescendingOrder)
+            # self.tableWidget_1.sortItems(0, Qt.DescendingOrder)
 
             if len(results) == 0:
                 QMessageBox.warning(self, "검색 결과", "선택한 조건에 맞는 데이터가 없습니다.")
@@ -436,7 +436,7 @@ class WindowClass(QMainWindow, from_class):
         except Exception as e:
             print(f"Error details: {str(e)}")
             QMessageBox.warning(self, "오류", f"데이터를 불러오는 중 오류가 발생했습니다: {str(e)}")
-    
+
 
     def load_admin_db(self):
         start_date2 = self.dateTime_start_2.dateTime().toString("yyyy-MM-dd HH:mm:ss")
@@ -452,7 +452,7 @@ class WindowClass(QMainWindow, from_class):
         AND (ol.time BETWEEN %s AND %s)
         """
         
-        if search_text:  # 수정된 부분
+        if search_text:
             if search_option == 'All':
                 additional_condition = """
                 AND (ud.car_number LIKE %s OR od.objects LIKE %s OR ol.time LIKE %s)
@@ -471,7 +471,7 @@ class WindowClass(QMainWindow, from_class):
             query = base_query
             params = (start_date2, end_date2)
 
-        try:  # 예외 처리 추가
+        try:
             self.cursor.execute(query, params)
             results = self.cursor.fetchall()
             
@@ -482,7 +482,7 @@ class WindowClass(QMainWindow, from_class):
 
             for i, result in enumerate(results):
                 date_time, car_number, _object, image_path, image_name, json_data = result
-                date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
+                date_time_str = date_time.strftime("%Y-%m-%d %H:%M:%S")
 
                 item_1 = QTableWidgetItem(date_time_str)
                 item_2 = QTableWidgetItem(car_number)
@@ -498,7 +498,7 @@ class WindowClass(QMainWindow, from_class):
                 self.tableWidget_2.setItem(i, 4, QTableWidgetItem(image_name))
                 self.tableWidget_2.setItem(i, 5, QTableWidgetItem(json_data))
             
-            self.tableWidget_2.sortItems(0, Qt.DescendingOrder)
+            # self.tableWidget_2.sortItems(0, Qt.DescendingOrder)
             
             if len(results) == 0:
                 QMessageBox.warning(self, "검색 결과", "선택한 조건에 맞는 데이터가 없습니다.")
