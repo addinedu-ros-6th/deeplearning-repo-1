@@ -15,36 +15,30 @@
 | 김기욱 | 트랙 설계,트랙 제작, 라벨링, 모델 학습 |    
 
 ## 1.4 기술 스택
-|팀원|	역할 |
-|:----------:|:----------:|
+
 | 개발환경 | ![image](https://github.com/user-attachments/assets/2fde54c4-c391-4aae-a777-f749c6c593f3)![image](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)| 
 | DB | ![image](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)![image](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)| 
 | ComputerVision | ![image](https://github.com/user-attachments/assets/a72d405e-0507-48bb-ad1c-0a0879cf8343)![image](https://github.com/user-attachments/assets/5542d0f5-9d46-4279-8667-5fb43f068b72)|   
 | 협업 | ![image](https://github.com/user-attachments/assets/dab4504a-0ccf-4885-95a8-c5d799251876)![image](https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=Jira&logoColor=white)![image](https://github.com/user-attachments/assets/5a9477c0-3522-4251-8f0e-e1e39ecc5538)|    
 | 하드웨어 | ![image](https://github.com/user-attachments/assets/971f194b-30b9-4cbe-bf93-b55da8f60327)![image](https://github.com/user-attachments/assets/2a1cab47-70ac-45e8-a02b-ac4b89821052)|  
-## 1.4 구현 기능 및 관련 기술
-System Requirements
+## 2 설계
+
+## 2.1 System Requirements
 
 ![image](https://github.com/user-attachments/assets/a0656b87-7abd-45bf-b08f-d8563af95463)
 
-## 1.5 시스템 구성도
+## 2.2 System Architecture
 ![image](https://github.com/user-attachments/assets/3f1c3042-8eff-41d2-87b2-f29da57473e4)
 
-## 1.6 DATA BASE
+## 2.3 DB설계
 ![image](https://github.com/user-attachments/assets/8953e560-ecbf-4fd0-a911-a5c6c3ff4053)
 
-## 1.7 도로 트랙 도면
+## 2.4 Track
 ![트랙](https://github.com/user-attachments/assets/b98b88d7-b56e-469f-99fd-9dbb435026dd)
 
 
 
-## 1.7 GUI 구버전
-![image](https://github.com/user-attachments/assets/a0c5b6f5-c8e7-45d0-9604-5001bf06335f)
-![image](https://github.com/user-attachments/assets/010d945e-5b8e-47d9-912a-b6a479eabe97)
-![image](https://github.com/user-attachments/assets/b9c7c3d3-78ed-4a7e-b50d-ec2b1353b3b6)
-![image](https://github.com/user-attachments/assets/ecba9bd2-0d1c-4a7b-8289-8dcd2c700c56)
-
-## 1.8 GUI 신버전
+## 2.5 GUI 
 ![Screenshot from 2024-09-24 18-13-04](https://github.com/user-attachments/assets/6554c368-3219-4772-bcf2-67263a1b77a7)
 ![Screenshot from 2024-09-24 18-13-24](https://github.com/user-attachments/assets/8f250aec-accd-4722-8b47-719b043f53f4)
 ![image](https://github.com/user-attachments/assets/db738b97-7717-46d0-83c8-55ef712b0d87)
