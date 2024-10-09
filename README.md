@@ -19,7 +19,8 @@
 |:----------:|:----------:|
 | 언어 | ![image](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) | 
 | DB | ![image](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white),![image](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)| 
-| ComputerVision | ![image](https://github.com/user-attachments/assets/71869631-7845-472c-a033-f62ea5783e03) |   
+| ComputerVision | ![image](https://github.com/user-attachments/assets/a72d405e-0507-48bb-ad1c-0a0879cf8343)
+ |   
 | 김정현 | 로봇 속도 구현, opencv 색상 검출, 시나리오 작성, opencv 데이터통신 |    
 | 김기욱 | 트랙 설계,트랙 제작, 라벨링, 모델 학습 |  
 ## 1.4 구현 기능 및 관련 기술
