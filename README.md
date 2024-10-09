@@ -15,7 +15,8 @@
 | 김기욱 | 트랙 설계,트랙 제작, 라벨링, 모델 학습 |    
 
 ## 1.4 기술 스택
-
+| 구분 |	상세 |
+|:----------:|:----------:|
 | 개발환경 | ![image](https://github.com/user-attachments/assets/2fde54c4-c391-4aae-a777-f749c6c593f3)![image](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)| 
 | DB | ![image](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)![image](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)| 
 | ComputerVision | ![image](https://github.com/user-attachments/assets/a72d405e-0507-48bb-ad1c-0a0879cf8343)![image](https://github.com/user-attachments/assets/5542d0f5-9d46-4279-8667-5fb43f068b72)|   
