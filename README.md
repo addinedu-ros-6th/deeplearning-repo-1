@@ -5,7 +5,7 @@
 
 ## 1.2 프로젝트 기간 : 2024. 08. 30 ~ 2024. 09. 25
   
-## 1.3 역할 분담
+## 1.3 Team
 |팀원|	역할 |
 |:----------:|:----------:|
 | 강지훈 | 모델학습,db설계,gui 설계,logging알고리즘 작성, 라벨링 | 
@@ -14,7 +14,7 @@
 | 김정현 | 로봇 속도 구현, opencv 색상 검출, 시나리오 작성, opencv 데이터통신 |    
 | 김기욱 | 트랙 설계,트랙 제작, 라벨링, 모델 학습 |    
 
-## 1.4 기술 스택
+## 1.4 Tech
 | 구분 |	상세 |
 |:----------:|:----------:|
 | 개발환경 | ![image](https://github.com/user-attachments/assets/2fde54c4-c391-4aae-a777-f749c6c593f3)![image](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)| 
@@ -22,14 +22,14 @@
 | ComputerVision | ![image](https://github.com/user-attachments/assets/a72d405e-0507-48bb-ad1c-0a0879cf8343)![image](https://github.com/user-attachments/assets/5542d0f5-9d46-4279-8667-5fb43f068b72)|   
 | 협업 | ![image](https://github.com/user-attachments/assets/dab4504a-0ccf-4885-95a8-c5d799251876)![image](https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=Jira&logoColor=white)![image](https://github.com/user-attachments/assets/5a9477c0-3522-4251-8f0e-e1e39ecc5538)|    
 | 하드웨어 | ![image](https://github.com/user-attachments/assets/971f194b-30b9-4cbe-bf93-b55da8f60327)![image](https://github.com/user-attachments/assets/2a1cab47-70ac-45e8-a02b-ac4b89821052)|  
-## 2 설계
+## 2 System Design
 
 ## 2.1 System Requirements
 
 ![image](https://github.com/user-attachments/assets/a0656b87-7abd-45bf-b08f-d8563af95463)
 
 ## 2.2 System Architecture
-![image](https://github.com/user-attachments/assets/3f1c3042-8eff-41d2-87b2-f29da57473e4)
+![image](https://github.com/user-attachments/assets/f4437f85-f976-448e-9246-87de4cc1dc99)
 
 ## 2.3 DB설계
 ![image](https://github.com/user-attachments/assets/8953e560-ecbf-4fd0-a911-a5c6c3ff4053)
@@ -46,19 +46,8 @@
 
 
 
+## 3 
 
-## 1.8 프로그램 실행
-```
-cd dev_ws
-```
-
-```
-cd deeplearning-repo-1
-```
-
-```
-python3 main.py 실행
-```
 ## 1.9 실행
 ![output_20240924_180932](https://github.com/user-attachments/assets/b0e36a43-b6ba-429f-bbad-f12ce942911d)
 
