@@ -5,7 +5,7 @@
 
 ## 1.2 프로젝트 기간 : 2024. 08. 30 ~ 2024. 09. 25
   
-## 1.3 프로젝트 계획표
+## 1.3 역할 분담
 |팀원|	역할 |
 |:----------:|:----------:|
 | 강지훈 | 모델학습,db설계,gui 설계,logging알고리즘 작성, 라벨링 | 
@@ -14,6 +14,14 @@
 | 김정현 | 로봇 속도 구현, opencv 색상 검출, 시나리오 작성, opencv 데이터통신 |    
 | 김기욱 | 트랙 설계,트랙 제작, 라벨링, 모델 학습 |    
 
+## 1.4 기술 스택
+|팀원|	역할 |
+|:----------:|:----------:|
+| 언어 | https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white | 
+| DB | https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white,  https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white| 
+| ComputerVision | ![image](https://github.com/user-attachments/assets/71869631-7845-472c-a033-f62ea5783e03) |   
+| 김정현 | 로봇 속도 구현, opencv 색상 검출, 시나리오 작성, opencv 데이터통신 |    
+| 김기욱 | 트랙 설계,트랙 제작, 라벨링, 모델 학습 |  
 ## 1.4 구현 기능 및 관련 기술
 System Requirements
 
