@@ -17,11 +17,11 @@
 ## 1.4 Tech
 | 구분 |	상세 |
 |:----------:|:----------:|
-| 개발환경 | ![image](https://github.com/user-attachments/assets/2fde54c4-c391-4aae-a777-f749c6c593f3)![image](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)| 
-| DB | ![image](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)![image](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)| 
-| ComputerVision | ![image](https://github.com/user-attachments/assets/a72d405e-0507-48bb-ad1c-0a0879cf8343)![image](https://github.com/user-attachments/assets/5542d0f5-9d46-4279-8667-5fb43f068b72)|   
-| 협업 | ![image](https://github.com/user-attachments/assets/dab4504a-0ccf-4885-95a8-c5d799251876)![image](https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=Jira&logoColor=white)![image](https://github.com/user-attachments/assets/5a9477c0-3522-4251-8f0e-e1e39ecc5538)|    
-| 하드웨어 | ![image](https://github.com/user-attachments/assets/971f194b-30b9-4cbe-bf93-b55da8f60327)![image](https://github.com/user-attachments/assets/2a1cab47-70ac-45e8-a02b-ac4b89821052)|  
+| 개발환경 | ![image](https://github.com/user-attachments/assets/2fde54c4-c391-4aae-a777-f749c6c593f3) ![image](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)| 
+| DB | ![image](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white) ![image](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)| 
+| ComputerVision | ![image](https://github.com/user-attachments/assets/a72d405e-0507-48bb-ad1c-0a0879cf8343) ![image](https://github.com/user-attachments/assets/5542d0f5-9d46-4279-8667-5fb43f068b72)|   
+| 협업 | ![image](https://github.com/user-attachments/assets/dab4504a-0ccf-4885-95a8-c5d799251876) ![image](https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=Jira&logoColor=white) ![image](https://github.com/user-attachments/assets/5a9477c0-3522-4251-8f0e-e1e39ecc5538)|    
+| 하드웨어 | ![image](https://github.com/user-attachments/assets/971f194b-30b9-4cbe-bf93-b55da8f60327) ![image](https://github.com/user-attachments/assets/2a1cab47-70ac-45e8-a02b-ac4b89821052)|  
 ## 2 System Design
 
 ## 2.1 System Requirements
