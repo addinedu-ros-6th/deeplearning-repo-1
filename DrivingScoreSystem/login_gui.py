@@ -8,7 +8,7 @@ import os
 db_config = {
     'host': 'database-1.cpog6osggiv3.ap-northeast-2.rds.amazonaws.com',
     'user': 'arduino_PJT',
-    'password': '1234',
+    'password': '****',
     'database': 'ardumension'
 }
 
